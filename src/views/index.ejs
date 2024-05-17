@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="header h-[20vh] w-full">
+      <div class="h-[10vh] w-full"></div>
+      <div class="h-[10vh] w-full flex pl-[10vh]">
+        <h1 class="text-white text-[2.5vh] font-semibold m-4">Home</h1>
+        <h1 class="text-white text-[2.5vh] font-semibold m-4">Custom Query</h1>
+      </div>
+    </div>
+    <div class="min-h-min w-full bg-[#2f2f2f] p-[10vh]">
+      <div class="min-h-min w-full p-[2vh]">
+        <label class="text-white text-[2vh]" for="tables">Table</label><br />
+        <div class="flex h-[6vh] items-center justify-center">
+          <select
+            class="w-full bg-transparent text-white border border-gray-600 rounded-[1vh] p-[1vh]"
+            name="tables"
+            id="tables"
+          >
+            <option selected="true" disabled="disabled">Choose Table</option>
+          </select>
+          <!-- <button
+            onclick="my_modal_2.showModal()"
+            class="text-white text-[2vh] w-[15vh] h-[5vh] rounded-md bg-blue-600 m-4"
+          >
+            Create table
+          </button> -->
+        </div>
+      </div>
+      <div class="min-h-min w-full p-[2vh]">
+        <div id="table-data" class="h-[80vh] overflow-auto"></div>
+      </div>
+    </div>
+    <dialog id="my_modal_1" class="modal">
+      <div class="modal-box">
+        <p class="py-4">Name</p>
+        <input
+          type="text"
+          placeholder="Type here"
+          class="input input-bordered w-full"
+        />
+        <div class="modal-action">
+          <button class="btn bg-blue-600 text-white">Insert</button>
+          <form method="dialog">
+            <button class="btn">Close</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+    <dialog id="my_modal_2" class="modal">
+      <div class="modal-box">
+        <button class="btn mt-[2vh]" id="add-input">Add field</button>
+        <select
+          id="input-type"
+          class="w-[20vh] bg-transparent text-black border border-gray-600 rounded-[1vh] p-[1vh]"
+        >
+          <option selected="true" disabled="disabled">Choose Type</option>
+          <option value="text">Text</option>
+          <option value="number">Number</option>
+        </select>
+        <div id="input-container"></div>
+        <div class="modal-action">
+          <form method="dialog">
+            <button id="get-values" class="btn bg-blue-600 text-white m-2">
+              Create
+            </button>
+            <button class="btn">Close</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+  </body>
+</html>
+
+<script>
+  let tablename;
+  async function fetchData() {
+    try {
+      const response = await fetch("/api/tables"); // Update with your actual endpoint
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      populateSelect(data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+  function populateSelect(tables) {
+    const select = document.getElementById("tables");
+    tables.forEach((table) => {
+      const option = document.createElement("option");
+      option.value = table.name;
+      option.textContent = table.name;
+      select.appendChild(option);
+    });
+
+    // Add event listener for table selection
+    select.addEventListener("change", function () {
+      tablename = this.value;
+      fetchTableData(this.value);
+    });
+  }
+
+  async function fetchTableData(tableName) {
+    try {
+      const response = await fetch(`/api/tables/${tableName}`);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      if (data.bool) {
+        displayTableData(data.data);
+      } else {
+        console.error("Error fetching table data:", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching table data:", error);
+    }
+  }
+
+  function displayTableData(data) {
+    const tableDataDiv = document.getElementById("table-data");
+    tableDataDiv.innerHTML = ""; // Clear previous data
+
+    if (data.length > 0) {
+      const table = document.createElement("table");
+      table.classList.add("w-full", "border", "border-gray-600", "text-white");
+
+      // Create table headers
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      Object.keys(data[0]).forEach((key) => {
+        const th = document.createElement("th");
+        th.textContent = key;
+        th.classList.add("border", "border-gray-600", "text-left", "p-2");
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Create table body
+      const tbody = document.createElement("tbody");
+      data.forEach((row) => {
+        const tr = document.createElement("tr");
+        Object.values(row).forEach((value) => {
+          const td = document.createElement("td");
+          td.textContent = value;
+          td.classList.add("border", "border-gray-600", "p-2");
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+
+      tableDataDiv.appendChild(table);
+    } else {
+      const h1 = document.createElement("h1");
+      h1.classList.add("text-white", "text-center", "text-[2vh]");
+      h1.innerHTML = "No data available for this table.";
+      tableDataDiv.appendChild(h1);
+    }
+  }
+
+  // Call fetchTables when the page loads
+  document.addEventListener("DOMContentLoaded", fetchData);
+
+  document.getElementById("add-input").addEventListener("click", function () {
+    const container = document.getElementById("input-container");
+    const inputDiv = document.createElement("div");
+    inputDiv.classList.add("input-container");
+
+    const inputType = document.getElementById("input-type").value;
+    const input = document.createElement("input");
+    input.type = inputType;
+    input.placeholder = "Type here";
+    input.classList.add("input", "input-bordered", "w-full", "m-2");
+
+    inputDiv.appendChild(input);
+    container.appendChild(inputDiv);
+  });
+
+  document.getElementById("get-values").addEventListener("click", function () {
+    const inputs = document.querySelectorAll(".input-container input");
+    const values = [];
+    inputs.forEach((input) => {
+      values.push({ type: input.type, value: input.value });
+    });
+    console.log(values);
+  });
+</script>
+
+<style>
+  .header {
+    background: rgb(122, 58, 180);
+    background: -moz-linear-gradient(
+      90deg,
+      rgba(122, 58, 180, 1) 0%,
+      rgba(29, 129, 253, 1) 87%
+    );
+    background: -webkit-linear-gradient(
+      90deg,
+      rgba(122, 58, 180, 1) 0%,
+      rgba(29, 129, 253, 1) 87%
+    );
+    background: linear-gradient(
+      90deg,
+      rgba(122, 58, 180, 1) 0%,
+      rgba(29, 129, 253, 1) 87%
+    );
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#7a3ab4",endColorstr="#1d81fd",GradientType=1);
+  }
+</style>

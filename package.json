@@ -1,0 +1,40 @@
+{
+  "name": "sqlite-gui",
+  "version": "1.0.0",
+  "description": "GUI for SQLite databases",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AzouKr/sqlite-gui.git"
+  },
+  "keywords": [
+    "SQLite",
+    "GUI"
+  ],
+  "author": "AZOUKR",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/preset-react": "^7.24.1",
+    "autoprefixer": "^10.4.19",
+    "babel-cli": "^6.26.0",
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "fs": "^0.0.1-security",
+    "nodemon": "^3.1.0",
+    "sqlite3": "^5.1.7",
+    "tailwindcss": "^3.4.3"
+  },
+  "devDependencies": {
+    "daisyui": "^4.11.1"
+  },
+  "bugs": {
+    "url": "https://github.com/AzouKr/sqlite-gui/issues"
+  },
+  "homepage": "https://github.com/AzouKr/sqlite-gui#readme"
+}
