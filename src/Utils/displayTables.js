@@ -52,12 +52,25 @@ function fetchTableInfo(db, table) {
         console.log("Error while fetching table info");
         reject({ bool: false, error: error.message });
       } else {
-        // console.log("Successfully fetched table info");
-        const tableInfo = rows.map((row) => ({
+        // Filter out the auto-increment column
+        const filteredColumns = rows.filter(
+          (row) => !(row.pk > 0 && row.type.toUpperCase() === "INTEGER")
+        );
+
+        // Map the remaining columns to an array of column objects with name and type
+        const tableInfo = filteredColumns.map((row) => ({
           field: row.name,
           type: row.type,
         }));
-        resolve({ bool: true, data: tableInfo });
+
+        if (tableInfo.length === 0) {
+          reject({
+            bool: false,
+            error: "No columns to select (all columns are auto-increment).",
+          });
+        } else {
+          resolve({ bool: true, data: tableInfo });
+        }
       }
     });
   });

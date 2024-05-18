@@ -60,33 +60,31 @@ function displayTableData(fields, dataObject) {
   mainBodyDiv.appendChild(headerDiv);
 
   fields.forEach((field) => {
-    if (field.field !== "id") {
-      const label = document.createElement("label");
-      label.classList.add("input_label");
-      label.textContent = field.field;
-      mainBodyDiv.appendChild(label);
+    const label = document.createElement("label");
+    label.classList.add("input_label");
+    label.textContent = field.field;
+    mainBodyDiv.appendChild(label);
 
-      const br = document.createElement("br");
-      mainBodyDiv.appendChild(br);
+    const br = document.createElement("br");
+    mainBodyDiv.appendChild(br);
 
-      const input = document.createElement("input");
-      input.type = getInputType(field.type);
-      input.classList.add("input_form");
-      input.id = `input-${field.field}`; // Set a unique ID for each input
-      input.dataset.field = field.field; // Store the field name
-      input.dataset.type = field.type; // Store the field type
+    const input = document.createElement("input");
+    input.type = getInputType(field.type);
+    input.classList.add("input_form");
+    input.id = `input-${field.field}`; // Set a unique ID for each input
+    input.dataset.field = field.field; // Store the field name
+    input.dataset.type = field.type; // Store the field type
 
-      // Set placeholder and value with the corresponding value from dataObject
-      if (dataObject && dataObject.hasOwnProperty(field.field)) {
-        input.placeholder = dataObject[field.field];
-        input.value = dataObject[field.field];
-      }
-
-      mainBodyDiv.appendChild(input);
-
-      const br2 = document.createElement("br");
-      mainBodyDiv.appendChild(br2);
+    // Set placeholder and value with the corresponding value from dataObject
+    if (dataObject && dataObject.hasOwnProperty(field.field)) {
+      input.placeholder = dataObject[field.field];
+      input.value = dataObject[field.field];
     }
+
+    mainBodyDiv.appendChild(input);
+
+    const br2 = document.createElement("br");
+    mainBodyDiv.appendChild(br2);
   });
 
   // Create button for editing

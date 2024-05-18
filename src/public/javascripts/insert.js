@@ -53,24 +53,22 @@ function displayTableData(fields) {
   mainBodyDiv.appendChild(headerDiv);
 
   fields.forEach((field) => {
-    if (field.field !== "id") {
-      const label = document.createElement("label");
-      label.classList.add("input_label");
-      label.textContent = field.field;
-      mainBodyDiv.appendChild(label);
+    const label = document.createElement("label");
+    label.classList.add("input_label");
+    label.textContent = field.field;
+    mainBodyDiv.appendChild(label);
 
-      const br = document.createElement("br");
-      mainBodyDiv.appendChild(br);
+    const br = document.createElement("br");
+    mainBodyDiv.appendChild(br);
 
-      const input = document.createElement("input");
-      input.classList.add("input_form");
-      input.type = getInputType(field.type);
-      input.placeholder = field.field;
-      mainBodyDiv.appendChild(input);
+    const input = document.createElement("input");
+    input.classList.add("input_form");
+    input.type = getInputType(field.type);
+    input.placeholder = field.field;
+    mainBodyDiv.appendChild(input);
 
-      const br2 = document.createElement("br");
-      mainBodyDiv.appendChild(br2);
-    }
+    const br2 = document.createElement("br");
+    mainBodyDiv.appendChild(br2);
   });
 
   const insertButton = document.createElement("button");
