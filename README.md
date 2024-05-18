@@ -62,7 +62,7 @@ SqliteGuiNode(db, 3005).catch((err) => {
 
 | Argument | Type               | Description                                                              |
 | -------- | ------------------ | ------------------------------------------------------------------------ |
-| db       | `sqlite3.Database` | The file path of your SQLite database.                                   |
+| db       | `sqlite3.Database` | The file of your SQLite database.                                        |
 | port     | number             | (Optional) The port on which the GUI server will run. Default is `8080`. |
 
 ## Updating the Package
