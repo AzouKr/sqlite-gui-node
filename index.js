@@ -28,12 +28,11 @@ app.get("/edit/:table/:id", (req, res) => {
 });
 const tableRoutes = require("./src/routes/tables");
 
-async function main(db) {
+async function SqliteGuiNode(db, port = 8080) {
   app.use("/api/tables", tableRoutes(db));
-  const port = process.env.port || 8080;
   app.listen(port, () => {
     console.log(`SQLite Web Admin Tool running at http://localhost:${port}`);
   });
 }
 
-module.exports = main;
+module.exports = SqliteGuiNode;
