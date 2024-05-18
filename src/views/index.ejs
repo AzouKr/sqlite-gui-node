@@ -3,40 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="/stylesheets/output.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
     <script src="/javascripts/home.js"></script>
+
     <title>Document</title>
   </head>
   <body>
-    <div class="header h-[20vh] w-full">
-      <div class="h-[10vh] w-full"></div>
-      <div class="h-[10vh] w-full flex pl-[10vh]">
-        <h1 class="text-white text-[2.5vh] font-semibold m-4">Home</h1>
-        <h1 class="text-white text-[2.5vh] font-semibold m-4">Custom Query</h1>
+    <div class="page_body">
+      <div class="sidebar">
+        <div class=""></div>
+        <h1 class="sidebar_title">Tables</h1>
+        <a href="/createtable">
+          <div class="sidebar_table_div_btn">
+            <button class="create_btn">Create</button>
+          </div>
+        </a>
       </div>
-    </div>
-    <div class="min-h-min w-full bg-[#2f2f2f] p-[10vh]">
-      <div class="min-h-min w-full p-[2vh]">
-        <label class="text-white text-[2vh]" for="tables">Table</label><br />
-        <div class="flex h-[6vh] items-center justify-center">
-          <select
-            class="w-full bg-transparent text-white border border-gray-600 rounded-[1vh] p-[1vh]"
-            name="tables"
-            id="tables"
-          >
-            <option selected="true" disabled="disabled">Choose Table</option>
-          </select>
-          <a href="/createtable"
-            ><button
-              class="text-white text-[2vh] w-[15vh] h-[5vh] rounded-md bg-blue-600 m-4"
-            >
-              Create table
-            </button></a
-          >
+
+      <div class="right_side">
+        <div class="main_body">
+          <h1 class="body_title">Select Table to View it</h1>
         </div>
-      </div>
-      <div class="min-h-min w-full p-[2vh]">
-        <div id="table-data" class="h-[80vh] overflow-auto"></div>
       </div>
     </div>
   </body>

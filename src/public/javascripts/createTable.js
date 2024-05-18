@@ -1,10 +1,16 @@
 async function createForm() {
-  const insertButton = document.getElementById("insert-field-btn");
-  const createButton = document.getElementById("create-btn");
+  const insertButton = document.getElementById("insert_btn");
+  const createButton = document.getElementById("create_table_btn");
+
   insertButton.onclick = () => {
-    const fieldName = document.getElementById("field-name").value;
+    const fieldNameInput = document.querySelector(
+      ".main_body .input_form_name"
+    );
+    const fieldName = fieldNameInput.value;
     const inputType = document.getElementById("input-type").value;
-    const tableDataTbody = document.getElementById("table-data");
+    const tableDataTbody = document.querySelector(
+      ".main_body .table_component tbody"
+    );
 
     if (!fieldName) {
       alert("Please enter the name of the field");
@@ -14,11 +20,9 @@ async function createForm() {
     const newRow = document.createElement("tr");
 
     const nameCell = document.createElement("td");
-    nameCell.className = "border border-gray-600 text-left p-2";
     nameCell.innerText = fieldName;
 
     const typeCell = document.createElement("td");
-    typeCell.className = "border border-gray-600 text-left p-2";
     typeCell.innerText = inputType;
 
     newRow.appendChild(nameCell);
@@ -27,12 +31,22 @@ async function createForm() {
     tableDataTbody.appendChild(newRow);
 
     // Clear the field name input after adding
-    document.getElementById("field-name").value = "";
+    fieldNameInput.value = "";
   };
 
   createButton.onclick = () => {
-    const rows = document.querySelectorAll("#table-data tr");
-    const tableName = document.getElementById("table-name").value;
+    const rows = document.querySelectorAll(
+      ".main_body .table_component tbody tr"
+    );
+    const tableNameInput = document.querySelector(
+      ".main_body input.input_form"
+    );
+    const tableName = tableNameInput.value;
+
+    if (!tableName) {
+      alert("Please enter the name of the table");
+      return;
+    }
 
     const data = Array.from(rows).map((row) => {
       const cells = row.querySelectorAll("td");
@@ -41,6 +55,7 @@ async function createForm() {
         type: cells[1].innerText,
       };
     });
+
     fetch("/api/tables/create", {
       method: "POST",
       headers: {
@@ -56,10 +71,10 @@ async function createForm() {
         window.location.href = `/`;
       })
       .catch((error) => {
-        console.error("Error inserting data:", error);
+        console.error("Error creating table:", error);
       });
   };
 }
 
-// Call fetchTables when the page loads
+// Call createForm when the page loads
 document.addEventListener("DOMContentLoaded", createForm);

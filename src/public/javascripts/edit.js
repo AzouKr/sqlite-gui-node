@@ -1,17 +1,17 @@
 let tablename;
 let userId;
+
 document.addEventListener("DOMContentLoaded", async () => {
-  const tableName = window.location.pathname.split("/")[2];
-  tablename = tableName;
-  const id = window.location.pathname.split("/")[3];
-  userId = id;
-  const response = await fetch(`/api/tables/getrecord/${tableName}/${id}`); // Correct endpoint
+  const pathParts = window.location.pathname.split("/");
+  tablename = pathParts[2];
+  userId = pathParts[3];
+  const response = await fetch(`/api/tables/getrecord/${tablename}/${userId}`); // Correct endpoint
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
   const data = await response.json();
   if (data.bool) {
-    await fetchTableInfos(tableName, data.data[0]);
+    await fetchTableInfos(tablename, data.data[0]);
   } else {
     console.error("Error fetching table data:", data.error);
   }
@@ -37,124 +37,105 @@ async function fetchTableInfos(tableName, dataObject) {
 function getInputType(fieldType) {
   switch (fieldType.toUpperCase()) {
     case "INTEGER":
+    case "REAL":
       return "number";
     case "TEXT":
-      return "text";
-    case "REAL":
-      return "number"; // You might want to handle decimal types more precisely
-    case "BLOB":
-      return "file";
     default:
       return "text";
   }
 }
 
 function displayTableData(fields, dataObject) {
-  const tableDataDiv = document.getElementById("table-data");
-  tableDataDiv.innerHTML = ""; // Clear previous data
+  const mainBodyDiv = document.querySelector(".main_body");
+  mainBodyDiv.innerHTML = ""; // Clear previous data
 
-  if (fields.length > 0) {
-    fields.forEach((field) => {
-      if (field.field !== "id") {
-        const label = document.createElement("label");
-        label.classList.add("text-white", "text-[3vh]");
-        label.textContent = field.field;
-        tableDataDiv.appendChild(label);
+  const headerDiv = document.createElement("div");
+  headerDiv.classList.add("main_body_header");
 
-        const br = document.createElement("br");
-        tableDataDiv.appendChild(br);
+  const bodyTitle = document.createElement("h1");
+  bodyTitle.classList.add("body_title");
+  bodyTitle.textContent = "Edit the row :";
+  headerDiv.appendChild(bodyTitle);
 
-        const input = document.createElement("input");
-        input.type = getInputType(field.type);
-        input.classList.add("w-full", "h-[5vh]", "rounded-sm", "p-2");
-        input.id = `input-${field.field}`; // Set a unique ID for each input
-        input.dataset.field = field.field; // Store the field name
-        input.dataset.type = field.type; // Store the field type
+  mainBodyDiv.appendChild(headerDiv);
 
-        // Set placeholder and value with the corresponding value from dataObject
-        if (dataObject && dataObject.hasOwnProperty(field.field)) {
-          input.placeholder = dataObject[field.field];
-          input.value = dataObject[field.field];
-        }
+  fields.forEach((field) => {
+    if (field.field !== "id") {
+      const label = document.createElement("label");
+      label.classList.add("input_label");
+      label.textContent = field.field;
+      mainBodyDiv.appendChild(label);
 
-        tableDataDiv.appendChild(input);
+      const br = document.createElement("br");
+      mainBodyDiv.appendChild(br);
 
-        const br2 = document.createElement("br");
-        tableDataDiv.appendChild(br2);
+      const input = document.createElement("input");
+      input.type = getInputType(field.type);
+      input.classList.add("input_form");
+      input.id = `input-${field.field}`; // Set a unique ID for each input
+      input.dataset.field = field.field; // Store the field name
+      input.dataset.type = field.type; // Store the field type
+
+      // Set placeholder and value with the corresponding value from dataObject
+      if (dataObject && dataObject.hasOwnProperty(field.field)) {
+        input.placeholder = dataObject[field.field];
+        input.value = dataObject[field.field];
       }
+
+      mainBodyDiv.appendChild(input);
+
+      const br2 = document.createElement("br");
+      mainBodyDiv.appendChild(br2);
+    }
+  });
+
+  // Create button for editing
+  const editButton = document.createElement("button");
+  editButton.textContent = "Edit";
+  editButton.classList.add("insert_btn"); // Apply the class for styling
+  editButton.addEventListener("click", () => {
+    const inputs = document.querySelectorAll(".input_form");
+    const dataArray = Array.from(inputs).map((input) => {
+      let value = input.value;
+      const type = input.dataset.type;
+
+      // Use the value from dataObject if the input is not changed
+      if (!value) {
+        value = dataObject[input.dataset.field];
+      }
+
+      let formattedValue;
+      if (type.toUpperCase() === "INTEGER" || type.toUpperCase() === "REAL") {
+        formattedValue = parseFloat(value);
+      } else {
+        formattedValue = value;
+      }
+
+      return {
+        field: input.dataset.field,
+        value: formattedValue,
+        type: type,
+      };
     });
 
-    // Create button for insertion
-    const button = document.createElement("button");
-    button.textContent = "Edit";
-    button.classList.add(
-      "text-white",
-      "text-[2vh]",
-      "w-[10vh]",
-      "h-[5vh]",
-      "rounded-md",
-      "bg-blue-600",
-      "m-4"
-    );
-    button.addEventListener("click", () => {
-      const inputs = document.querySelectorAll("input[id^='input-']");
-      const dataArray = Array.from(inputs).map((input) => {
-        let value = input.value;
-        const type = input.dataset.type;
-
-        // Use the value from dataObject if the input is not changed
-        if (!value) {
-          value = dataObject[input.dataset.field];
+    // Send POST request to API
+    fetch("/api/tables/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tablename, dataArray, userId }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
-
-        let formattedValue;
-        if (type.toUpperCase() === "INTEGER" || type.toUpperCase() === "REAL") {
-          formattedValue = parseFloat(value);
-        } else {
-          formattedValue = value;
-        }
-
-        return {
-          field: input.dataset.field,
-          value: formattedValue,
-          type: type,
-        };
-      });
-
-      // Send POST request to API
-      fetch("/api/tables/update", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tablename, dataArray, userId }),
+        window.location.href = `/`;
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          window.location.href = `/`;
-        })
-        .catch((error) => {
-          console.error("Error inserting data:", error);
-        });
-    });
-    tableDataDiv.appendChild(button);
-  } else {
-    const h1 = document.createElement("h1");
-    h1.classList.add("text-white", "text-center", "text-[2vh]");
-    h1.innerHTML = "No data available for this table.";
-    tableDataDiv.appendChild(h1);
-  }
-}
+      .catch((error) => {
+        console.error("Error updating data:", error);
+      });
+  });
 
-function getInputType(fieldType) {
-  switch (fieldType.toUpperCase()) {
-    case "INTEGER":
-    case "REAL":
-      return "number";
-    case "TEXT":
-    default:
-      return "text";
-  }
+  mainBodyDiv.appendChild(editButton);
 }

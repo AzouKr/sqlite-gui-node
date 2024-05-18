@@ -3,25 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="/stylesheets/output.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
     <script src="/javascripts/insert.js"></script>
-    <title>Insert record</title>
+
+    <title>Document</title>
   </head>
   <body>
-    <div class="header h-[20vh] w-full">
-      <div class="h-[10vh] w-full"></div>
-      <div class="h-[10vh] w-full flex pl-[10vh]">
-        <a href="/"
-          ><h1 class="text-white text-[2.5vh] font-semibold m-4">Home</h1></a
+    <div class="page_body">
+      <div class="sidebar">
+        <div class=""></div>
+        <a style="text-decoration: none" href="/"
+          ><h1 class="sidebar_title">Home</h1></a
         >
-        <h1 class="text-white text-[2.5vh] font-semibold m-4">Custom Query</h1>
       </div>
-    </div>
-    <div class="min-h-[80vh] w-full bg-[#2f2f2f] p-[10vh]">
-      <div class="min-h-min w-full p-[2vh]">
-        <h1 class="text-white text-[4vh] mb-[5vh]">Insert a new record</h1>
-        <div id="table-data"></div>
+      <div class="right_side">
+        <div class="main_body">
+          <div class="main_body_header">
+            <h1 class="body_title">Insert new row :</h1>
+          </div>
+          <label class="input_label">Name</label><br />
+          <input class="input_form" />
+          <br />
+          <button class="insert_btn">Insert</button>
+        </div>
       </div>
     </div>
   </body>

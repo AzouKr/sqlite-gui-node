@@ -1,4 +1,5 @@
 let tablename;
+
 document.addEventListener("DOMContentLoaded", async () => {
   const tableName = window.location.pathname.split("/").pop();
   tablename = tableName;
@@ -38,88 +39,72 @@ function getInputType(fieldType) {
 }
 
 function displayTableData(fields) {
-  const tableDataDiv = document.getElementById("table-data");
-  tableDataDiv.innerHTML = ""; // Clear previous data
+  const mainBodyDiv = document.querySelector(".main_body");
+  mainBodyDiv.innerHTML = ""; // Clear previous data
 
-  if (fields.length > 0) {
-    fields.forEach((field) => {
-      if (field.field !== "id") {
-        const label = document.createElement("label");
-        label.classList.add("text-white", "text-[3vh]");
-        label.textContent = field.field;
-        tableDataDiv.appendChild(label);
+  const headerDiv = document.createElement("div");
+  headerDiv.classList.add("main_body_header");
 
-        const br = document.createElement("br");
-        tableDataDiv.appendChild(br);
+  const bodyTitle = document.createElement("h1");
+  bodyTitle.classList.add("body_title");
+  bodyTitle.textContent = "Insert new row :";
+  headerDiv.appendChild(bodyTitle);
 
-        const input = document.createElement("input");
-        input.type = getInputType(field.type);
-        input.classList.add("w-full", "h-[5vh]", "rounded-sm", "p-2");
-        input.id = `input-${field.field}`; // Set a unique ID for each input
-        input.dataset.field = field.field; // Store the field name
-        input.dataset.type = field.type; // Store the field type
-        tableDataDiv.appendChild(input);
+  mainBodyDiv.appendChild(headerDiv);
 
-        const br2 = document.createElement("br");
-        tableDataDiv.appendChild(br2);
-      }
+  fields.forEach((field) => {
+    if (field.field !== "id") {
+      const label = document.createElement("label");
+      label.classList.add("input_label");
+      label.textContent = field.field;
+      mainBodyDiv.appendChild(label);
+
+      const br = document.createElement("br");
+      mainBodyDiv.appendChild(br);
+
+      const input = document.createElement("input");
+      input.classList.add("input_form");
+      input.type = getInputType(field.type);
+      input.placeholder = field.field;
+      mainBodyDiv.appendChild(input);
+
+      const br2 = document.createElement("br");
+      mainBodyDiv.appendChild(br2);
+    }
+  });
+
+  const insertButton = document.createElement("button");
+  insertButton.textContent = "Insert";
+  insertButton.classList.add("insert_btn");
+  insertButton.addEventListener("click", () => {
+    const inputs = document.querySelectorAll(".input_form");
+    const dataArray = Array.from(inputs).map((input) => {
+      const value = input.value;
+      return {
+        field: input.placeholder,
+        value: value,
+        type: input.type,
+      };
     });
-
-    // Create button for insertion
-    const button = document.createElement("button");
-    button.textContent = "Insert";
-    button.classList.add(
-      "text-white",
-      "text-[2vh]",
-      "w-[10vh]",
-      "h-[5vh]",
-      "rounded-md",
-      "bg-blue-600",
-      "m-4"
-    );
-    button.addEventListener("click", () => {
-      const inputs = document.querySelectorAll("input[id^='input-']");
-      const dataArray = Array.from(inputs).map((input) => {
-        const value = input.value;
-        const type = input.dataset.type;
-        let formattedValue;
-
-        if (type.toUpperCase() === "INTEGER" || type.toUpperCase() === "REAL") {
-          formattedValue = parseFloat(value);
-        } else {
-          formattedValue = value;
+    // Send POST request to API
+    fetch("/api/tables/insert", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tablename, dataArray }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
-
-        return {
-          field: input.dataset.field,
-          value: formattedValue,
-          type: type,
-        };
-      });
-      // Send POST request to API
-      fetch("/api/tables/insert", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tablename, dataArray }),
+        // Handle response if needed
+        window.location.href = `/`;
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          // Handle response if needed
-          window.location.href = `/`;
-        })
-        .catch((error) => {
-          console.error("Error inserting data:", error);
-        });
-    });
-    tableDataDiv.appendChild(button);
-  } else {
-    const h1 = document.createElement("h1");
-    h1.classList.add("text-white", "text-center", "text-[2vh]");
-    h1.innerHTML = "No data available for this table.";
-    tableDataDiv.appendChild(h1);
-  }
+      .catch((error) => {
+        console.error("Error inserting data:", error);
+      });
+  });
+
+  mainBodyDiv.appendChild(insertButton);
 }

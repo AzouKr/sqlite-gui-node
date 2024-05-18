@@ -6,27 +6,40 @@ async function fetchData() {
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
-    populateSelect(data.data);
+    populateSidebar(data.data);
   } catch (error) {
     console.error("Error fetching data:", error);
   }
 }
 
-function populateSelect(tables) {
-  const select = document.getElementById("tables");
+function populateSidebar(tables) {
+  const sidebar = document.querySelector(".sidebar");
+
   tables.forEach((table) => {
     if (table.name !== "sqlite_sequence") {
-      const option = document.createElement("option");
-      option.value = table.name;
-      option.textContent = table.name;
-      select.appendChild(option);
+      const tableDiv = document.createElement("div");
+      tableDiv.classList.add("sidebar_table_div");
+
+      const img = document.createElement("img");
+      img.src = "./icons/table.svg";
+
+      const h1 = document.createElement("h1");
+      h1.textContent = table.name;
+
+      tableDiv.appendChild(img);
+      tableDiv.appendChild(h1);
+
+      sidebar.appendChild(tableDiv);
     }
   });
 
   // Add event listener for table selection
-  select.addEventListener("change", function () {
-    tablename = this.value;
-    fetchTableData(this.value);
+  const tableDivs = document.querySelectorAll(".sidebar_table_div");
+  tableDivs.forEach((div) => {
+    div.addEventListener("click", function () {
+      tablename = this.querySelector("h1").textContent;
+      fetchTableData(tablename);
+    });
   });
 }
 
@@ -48,41 +61,27 @@ async function fetchTableData(tableName) {
 }
 
 function displayTableData(data) {
-  const tableDataDiv = document.getElementById("table-data");
-  tableDataDiv.innerHTML = ""; // Clear previous data
+  const mainBodyDiv = document.querySelector(".main_body");
+  mainBodyDiv.innerHTML = ""; // Clear previous data
+
+  const headerDiv = document.createElement("div");
+  headerDiv.classList.add("main_body_header");
 
   if (data.length > 0) {
-    // Create button for insertion
-    const button = document.createElement("button");
-    button.textContent = "Insert";
-    button.classList.add(
-      "text-white",
-      "text-[2vh]",
-      "w-[10vh]",
-      "h-[5vh]",
-      "rounded-md",
-      "bg-blue-600",
-      "m-4"
-    );
+    const insertButton = document.createElement("button");
+    insertButton.textContent = "Insert";
+    insertButton.classList.add("insert_btn");
     // Add event listener to button
-    button.onclick = () => {
+    insertButton.onclick = () => {
       window.location.href = `/insert/${tablename}`;
     };
-    tableDataDiv.appendChild(button);
-    // Create button for delete
-    const deletebutton = document.createElement("button");
-    deletebutton.textContent = "Delete Table";
-    deletebutton.classList.add(
-      "text-white",
-      "text-[2vh]",
-      "w-[20vh]",
-      "h-[5vh]",
-      "rounded-md",
-      "bg-red-500",
-      "m-4"
-    );
+    headerDiv.appendChild(insertButton);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete table";
+    deleteButton.classList.add("delete_btn");
     // Add event listener to button
-    deletebutton.onclick = () => {
+    deleteButton.onclick = () => {
       fetch("/api/tables/table/delete", {
         method: "POST",
         headers: {
@@ -100,50 +99,52 @@ function displayTableData(data) {
           console.error("Error inserting data:", error);
         });
     };
-    tableDataDiv.appendChild(deletebutton);
-    const div = document.createElement("div");
-    div.classList.add("w-full", "overflow-auto");
+    headerDiv.appendChild(deleteButton);
+    mainBodyDiv.appendChild(headerDiv);
+    const tableComponentDiv = document.createElement("div");
+    tableComponentDiv.classList.add("table_component");
+    tableComponentDiv.setAttribute("role", "region");
+    tableComponentDiv.setAttribute("tabindex", "0");
+
     const table = document.createElement("table");
-    table.classList.add(
-      "w-[130vw]",
-      "border",
-      "border-gray-600",
-      "text-white",
-      "bg-black"
-    );
-    // Create table headers
+
+    const caption = document.createElement("caption");
+    caption.textContent = tablename;
+    table.appendChild(caption);
+
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
     Object.keys(data[0]).forEach((key) => {
       const th = document.createElement("th");
       th.textContent = key;
-      th.classList.add("border", "border-gray-600", "text-left", "p-2");
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
-    // Create table body
     const tbody = document.createElement("tbody");
     data.forEach((row) => {
       const tr = document.createElement("tr");
       Object.values(row).forEach((value) => {
         const td = document.createElement("td");
         td.textContent = value;
-        td.classList.add("border", "border-gray-600", "p-2");
         tr.appendChild(td);
       });
-      const edit_td = document.createElement("td");
-      edit_td.innerHTML = "Edit";
-      edit_td.classList.add("border", "border-gray-600", "p-2");
-      edit_td.onclick = () => {
+
+      const editCell = document.createElement("td");
+      const editIcon = document.createElement("img");
+      editIcon.src = "./icons/edit.svg";
+      editCell.appendChild(editIcon);
+      editCell.onclick = () => {
         window.location.href = `/edit/${tablename}/${row.id}`;
       };
-      tr.appendChild(edit_td);
-      const delete_td = document.createElement("td");
-      delete_td.innerHTML = "Delete";
-      delete_td.classList.add("border", "border-gray-600", "p-2");
-      delete_td.onclick = () => {
+      tr.appendChild(editCell);
+
+      const deleteCell = document.createElement("td");
+      const deleteIcon = document.createElement("img");
+      deleteIcon.src = "./icons/delete.svg";
+      deleteCell.appendChild(deleteIcon);
+      deleteCell.onclick = () => {
         fetch("/api/tables/delete", {
           method: "POST",
           headers: {
@@ -161,45 +162,29 @@ function displayTableData(data) {
             console.error("Error inserting data:", error);
           });
       };
-      tr.appendChild(delete_td);
+      tr.appendChild(deleteCell);
+
       tbody.appendChild(tr);
     });
     table.appendChild(tbody);
 
-    div.appendChild(table);
-    tableDataDiv.appendChild(div);
+    tableComponentDiv.appendChild(table);
+    mainBodyDiv.appendChild(tableComponentDiv);
   } else {
-    // Create button for insertion
-    const button = document.createElement("button");
-    button.textContent = "Insert";
-    button.classList.add(
-      "text-white",
-      "text-[2vh]",
-      "w-[10vh]",
-      "h-[5vh]",
-      "rounded-md",
-      "bg-blue-600",
-      "m-4"
-    );
+    const insertButton = document.createElement("button");
+    insertButton.textContent = "Insert";
+    insertButton.classList.add("insert_btn");
     // Add event listener to button
-    button.onclick = () => {
+    insertButton.onclick = () => {
       window.location.href = `/insert/${tablename}`;
     };
-    tableDataDiv.appendChild(button);
-    // Create button for delete
-    const deletebutton = document.createElement("button");
-    deletebutton.textContent = "Delete Table";
-    deletebutton.classList.add(
-      "text-white",
-      "text-[2vh]",
-      "w-[20vh]",
-      "h-[5vh]",
-      "rounded-md",
-      "bg-red-500",
-      "m-4"
-    );
+    headerDiv.appendChild(insertButton);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete table";
+    deleteButton.classList.add("delete_btn");
     // Add event listener to button
-    deletebutton.onclick = () => {
+    deleteButton.onclick = () => {
       fetch("/api/tables/table/delete", {
         method: "POST",
         headers: {
@@ -217,11 +202,12 @@ function displayTableData(data) {
           console.error("Error inserting data:", error);
         });
     };
-    tableDataDiv.appendChild(deletebutton);
+    headerDiv.appendChild(deleteButton);
+    mainBodyDiv.appendChild(headerDiv);
     const h1 = document.createElement("h1");
     h1.classList.add("text-white", "text-center", "text-[2vh]");
-    h1.innerHTML = "No data available for this table.";
-    tableDataDiv.appendChild(h1);
+    h1.textContent = "No data available for this table.";
+    mainBodyDiv.appendChild(h1);
   }
 }
 

@@ -3,73 +3,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="/stylesheets/output.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
     <script src="/javascripts/createTable.js"></script>
-    <title>Create Table</title>
+    <title>Document</title>
   </head>
   <body>
-    <div class="header h-[20vh] w-full">
-      <div class="h-[10vh] w-full"></div>
-      <div class="h-[10vh] w-full flex pl-[10vh]">
-        <a href="/"
-          ><h1 class="text-white text-[2.5vh] font-semibold m-4">Home</h1></a
+    <div class="page_body">
+      <div class="sidebar">
+        <div class=""></div>
+        <a style="text-decoration: none" href="/"
+          ><h1 class="sidebar_title">Home</h1></a
         >
-        <h1 class="text-white text-[2.5vh] font-semibold m-4">Custom Query</h1>
       </div>
-    </div>
-    <div class="min-h-[80vh] w-full bg-[#2f2f2f] p-[10vh]">
-      <div class="min-h-min w-full p-[2vh]">
-        <h1 class="text-white text-[4vh] mb-[5vh]">Create new table</h1>
+      <div class="right_side">
+        <div class="main_body">
+          <div class="main_body_header">
+            <h1 class="body_title">Create new table :</h1>
+          </div>
+          <label class="input_label">Name of the table :</label><br />
+          <input class="input_form" />
+          <br />
+          <button id="insert_btn" class="insert_btn">Add column</button>
+          <input placeholder="name of the column" class="input_form_name" />
+          <select id="input-type" class="insert_btn">
+            <option value="TEXT">TEXT</option>
+            <option value="INTEGER">INTEGER</option>
+            <option value="REAL">REAL</option>
+          </select>
+          <div class="table_component" role="region" tabindex="0">
+            <table>
+              <thead>
+                <tr>
+                  <th>Column</th>
+                  <th>Data Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Name</td>
+                  <td>TEXT</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <button id="create_table_btn" class="insert_btn">Create Table</button>
+        </div>
       </div>
-      <input
-        type="text"
-        class="text-black text-[2vh] w-[20vh] h-[5vh] rounded-md m-2 p-2"
-        placeholder="name of the table"
-        id="table-name"
-      />
-      <button
-        id="insert-field-btn"
-        class="text-white text-[2vh] w-[15vh] h-[5vh] rounded-md bg-blue-600 m-4"
-      >
-        Insert Field
-      </button>
-      <input
-        type="text"
-        class="text-black text-[2vh] w-[20vh] h-[5vh] rounded-md m-2 p-2"
-        placeholder="name of the field"
-        id="field-name"
-      />
-      <select
-        id="input-type"
-        class="text-black text-[2vh] w-[15vh] h-[5vh] rounded-md"
-      >
-        <option value="TEXT">TEXT</option>
-        <option value="INTEGER">INTEGER</option>
-        <option value="REAL">REAL</option>
-      </select>
-      <table class="w-[90vh] border border-gray-600 text-white bg-black">
-        <thead>
-          <tr>
-            <th class="border border-gray-600 text-left p-2">
-              Name of the field
-            </th>
-            <th class="border border-gray-600 text-left p-2">
-              Type of the field
-            </th>
-          </tr>
-        </thead>
-        <tbody id="table-data">
-          <!-- Dynamic rows will be added here -->
-        </tbody>
-      </table>
-
-      <button
-        id="create-btn"
-        class="text-white text-[2vh] w-[15vh] h-[5vh] rounded-md bg-blue-600 m-4"
-      >
-        Create
-      </button>
     </div>
   </body>
 </html>

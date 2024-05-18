@@ -158,7 +158,10 @@ module.exports = function (db) {
       .map((item) => {
         if (item.value === null || item.value === "") {
           return "NULL";
-        } else if (item.type === "TEXT") {
+        } else if (
+          item.type.toUpperCase() === "TEXT" ||
+          item.type.toUpperCase() === "BLOB"
+        ) {
           return `'${item.value.replace(/'/g, "''")}'`; // Escape single quotes
         } else {
           return item.value;
