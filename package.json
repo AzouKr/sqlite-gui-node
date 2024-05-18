@@ -13,10 +13,14 @@
   },
   "keywords": [
     "SQLite",
-    "GUI"
+    "GUI",
+    "Node js",
+    "Node",
+    "Interface",
+    "SQL"
   ],
   "author": "AZOUKR",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@babel/core": "^7.24.5",
     "@babel/preset-react": "^7.24.1",
