@@ -83,7 +83,7 @@ $ npm uninstall sqlite-gui-node
 
 ## Troubleshooting
 
-If you encounter any issues during installation or usage, please refer to the Issues section on GitHub or check the FAQs below.
+If you encounter any issues during installation or usage, please refer to the Issues section on GitHub.
 
 ## License
 
