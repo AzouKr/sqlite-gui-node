@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/stylesheets/output.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/javascripts/createTable.js"></script>
+    <title>Create Table</title>
+  </head>
+  <body>
+    <div class="header h-[20vh] w-full">
+      <div class="h-[10vh] w-full"></div>
+      <div class="h-[10vh] w-full flex pl-[10vh]">
+        <a href="/"
+          ><h1 class="text-white text-[2.5vh] font-semibold m-4">Home</h1></a
+        >
+        <h1 class="text-white text-[2.5vh] font-semibold m-4">Custom Query</h1>
+      </div>
+    </div>
+    <div class="min-h-[80vh] w-full bg-[#2f2f2f] p-[10vh]">
+      <div class="min-h-min w-full p-[2vh]">
+        <h1 class="text-white text-[4vh] mb-[5vh]">Create new table</h1>
+      </div>
+      <input
+        type="text"
+        class="text-black text-[2vh] w-[20vh] h-[5vh] rounded-md m-2 p-2"
+        placeholder="name of the table"
+        id="table-name"
+      />
+      <button
+        id="insert-field-btn"
+        class="text-white text-[2vh] w-[15vh] h-[5vh] rounded-md bg-blue-600 m-4"
+      >
+        Insert Field
+      </button>
+      <input
+        type="text"
+        class="text-black text-[2vh] w-[20vh] h-[5vh] rounded-md m-2 p-2"
+        placeholder="name of the field"
+        id="field-name"
+      />
+      <select
+        id="input-type"
+        class="text-black text-[2vh] w-[15vh] h-[5vh] rounded-md"
+      >
+        <option value="TEXT">TEXT</option>
+        <option value="INTEGER">INTEGER</option>
+        <option value="REAL">REAL</option>
+      </select>
+      <table class="w-[90vh] border border-gray-600 text-white bg-black">
+        <thead>
+          <tr>
+            <th class="border border-gray-600 text-left p-2">
+              Name of the field
+            </th>
+            <th class="border border-gray-600 text-left p-2">
+              Type of the field
+            </th>
+          </tr>
+        </thead>
+        <tbody id="table-data">
+          <!-- Dynamic rows will be added here -->
+        </tbody>
+      </table>
+
+      <button
+        id="create-btn"
+        class="text-white text-[2vh] w-[15vh] h-[5vh] rounded-md bg-blue-600 m-4"
+      >
+        Create
+      </button>
+    </div>
+  </body>
+</html>
