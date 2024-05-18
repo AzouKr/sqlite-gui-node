@@ -89,15 +89,14 @@
 
 .table_component {
   overflow: auto;
-  width: 77vw;
+  width: 70vw;
   overflow: auto;
 }
 
 .table_component table {
   border: 1px solid #dededf;
   height: 100%;
-  min-width: 100%;
-  table-layout: fixed;
+  width: fit-content;
   border-collapse: collapse;
   border-spacing: 1px;
   text-align: left;
@@ -130,7 +129,8 @@
   border: 1px solid #dededf;
   background-color: #ffffff;
   color: #000000;
-  padding: 5px;
+  min-width: 5vw;
+  text-align: center;
 }
 
 .table_component td img {

@@ -119,6 +119,10 @@ function displayTableData(data) {
       th.textContent = key;
       headerRow.appendChild(th);
     });
+    const th = document.createElement("th");
+    headerRow.appendChild(th);
+    const th1 = document.createElement("th");
+    headerRow.appendChild(th1);
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
@@ -128,9 +132,9 @@ function displayTableData(data) {
       Object.values(row).forEach((value) => {
         const td = document.createElement("td");
         td.textContent = value;
+        td.style.width = "10vw";
         tr.appendChild(td);
       });
-
       const editCell = document.createElement("td");
       const editIcon = document.createElement("img");
       editIcon.src = "./icons/edit.svg";
