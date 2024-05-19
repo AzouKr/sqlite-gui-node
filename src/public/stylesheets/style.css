@@ -89,7 +89,7 @@
 
 .table_component {
   overflow: auto;
-  width: 70vw;
+  width: 73vw;
   overflow: auto;
 }
 
@@ -194,6 +194,49 @@
   color: black;
 }
 
+.create_box_container {
+  display: flex;
+}
+
+.create_box {
+  height: 13vh;
+  width: fit-content;
+  margin: 2vh;
+}
+
+.create_box_top {
+  height: 5vh;
+  min-width: 10vh;
+  display: flex;
+  align-items: center;
+  padding-left: 1vh;
+}
+.create_box_bottom {
+  min-height: 8vh;
+  min-width: 10vh;
+  display: flex;
+  align-items: center;
+}
+
+.input_box {
+  font-size: 2.5vh;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: black;
+}
+
+.check_box {
+  transform: scale(1.3);
+}
+.checkbox_label {
+  font-size: 2.8vh;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  color: black;
+}
+
 .input_form {
   height: 4vh;
   width: 80%;
@@ -205,7 +248,7 @@
 }
 .input_form_name {
   height: 4vh;
-  width: 20%;
+  width: 30vh;
   border-radius: 1vh;
   border: none;
   margin-top: 1vh;

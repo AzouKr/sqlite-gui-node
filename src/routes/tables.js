@@ -151,29 +151,35 @@ module.exports = function (db) {
 
   function generateInsertSQL(tableName, data) {
     // Extract field names
-    const columns = data.map((item) => item.field).join(", ");
+    const columns = [];
+    const values = [];
 
-    // Extract and format values based on their types
-    const values = data
-      .map((item) => {
-        if (item.value === null || item.value === "") {
-          return "NULL";
-        } else if (
+    data.forEach((item) => {
+      if (
+        item.value !== null &&
+        item.value !== undefined &&
+        item.value !== ""
+      ) {
+        columns.push(item.field);
+        if (
           item.type.toUpperCase() === "TEXT" ||
           item.type.toUpperCase() === "BLOB"
         ) {
-          return `'${item.value.replace(/'/g, "''")}'`; // Escape single quotes
+          values.push(`'${item.value.replace(/'/g, "''")}'`); // Escape single quotes
         } else {
-          return item.value;
+          values.push(item.value);
         }
-      })
-      .join(", ");
+      }
+    });
 
     // Form the SQL statement
-    const sql = `INSERT INTO ${tableName} (${columns}) VALUES (${values});`;
+    const sql = `INSERT INTO ${tableName} (${columns.join(
+      ", "
+    )}) VALUES (${values.join(", ")});`;
 
     return sql;
   }
+
   function generateUpdateSQL(tableName, data, id) {
     // Extract field names and their corresponding values
     const setClauses = data
@@ -214,7 +220,14 @@ module.exports = function (db) {
           default:
             throw new Error(`Unknown type: ${item.type}`);
         }
-        return `${item.name} ${columnType}`;
+        let columnDefinition = `${item.name} ${columnType}`;
+        if (item.pk !== "") {
+          columnDefinition += ` ${item.pk}`;
+        }
+        if (item.default !== null && item.default !== undefined) {
+          columnDefinition += ` DEFAULT ${item.default}`;
+        }
+        return columnDefinition;
       })
       .join(", ");
 

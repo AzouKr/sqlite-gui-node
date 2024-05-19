@@ -8,6 +8,11 @@ async function createForm() {
     );
     const fieldName = fieldNameInput.value;
     const inputType = document.getElementById("input-type").value;
+    const inputPk = document.getElementById("input-pk").value;
+    const defaultValueInput = document.querySelector(
+      ".create_box_bottom input[placeholder='Leave it empty for no default value']"
+    );
+    const defaultValue = defaultValueInput.value || "None";
     const tableDataTbody = document.querySelector(
       ".main_body .table_component tbody"
     );
@@ -25,13 +30,26 @@ async function createForm() {
     const typeCell = document.createElement("td");
     typeCell.innerText = inputType;
 
+    const pkCell = document.createElement("td");
+    pkCell.innerText = inputPk ? "YES" : "NO";
+
+    const defaultCell = document.createElement("td");
+    defaultCell.innerText = defaultValue;
+
     newRow.appendChild(nameCell);
     newRow.appendChild(typeCell);
+    newRow.appendChild(pkCell);
+    newRow.appendChild(defaultCell);
 
     tableDataTbody.appendChild(newRow);
 
-    // Clear the field name input after adding
+    // Clear the field name and default value inputs after adding
     fieldNameInput.value = "";
+    defaultValueInput.value = "";
+
+    // Reset the select inputs to their initial state
+    document.getElementById("input-type").selectedIndex = 0;
+    document.getElementById("input-pk").selectedIndex = 0;
   };
 
   createButton.onclick = () => {
@@ -50,9 +68,20 @@ async function createForm() {
 
     const data = Array.from(rows).map((row) => {
       const cells = row.querySelectorAll("td");
+      let defaultValue = cells[3].innerText;
+
+      // Check if default value is a number (integer or real)
+      if (!isNaN(defaultValue) && defaultValue !== "None") {
+        defaultValue = Number(defaultValue);
+      } else if (defaultValue === "None") {
+        defaultValue = null;
+      }
+
       return {
         name: cells[0].innerText,
         type: cells[1].innerText,
+        pk: cells[2].innerText === "YES" ? "PRIMARY KEY AUTOINCREMENT" : "",
+        default: defaultValue,
       };
     });
 

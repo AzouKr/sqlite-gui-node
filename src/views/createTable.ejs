@@ -33,19 +33,65 @@
           <label class="input_label">Name of the table :</label><br />
           <input class="input_form" />
           <br />
+          <br />
+          <br />
+          <div class="create_box_container">
+            <div class="create_box">
+              <div class="create_box_top">
+                <label class="input_box">Name</label><br />
+              </div>
+              <div class="create_box_bottom">
+                <input
+                  placeholder="name of the column"
+                  class="input_form_name"
+                />
+              </div>
+            </div>
+            <div class="create_box">
+              <div class="create_box_top">
+                <label class="input_box">Type</label><br />
+              </div>
+              <div class="create_box_bottom">
+                <select id="input-type" class="insert_btn">
+                  <option value="TEXT">TEXT</option>
+                  <option value="INTEGER">INTEGER</option>
+                  <option value="REAL">REAL</option>
+                </select>
+              </div>
+            </div>
+            <div class="create_box">
+              <div class="create_box_top">
+                <label class="input_box">Primary Key</label><br />
+              </div>
+              <div class="create_box_bottom">
+                <select id="input-pk" class="insert_btn">
+                  <option value="">No</option>
+                  <option value="PRIMARY KEY AUTOINCREMENT">Yes</option>
+                </select>
+              </div>
+            </div>
+            <div class="create_box">
+              <div class="create_box_top">
+                <label class="input_box">Default Value</label><br />
+              </div>
+              <div class="create_box_bottom">
+                <input
+                  placeholder="Leave it empty for no default value"
+                  class="input_form_name"
+                />
+              </div>
+            </div>
+          </div>
+          <br />
           <button id="insert_btn" class="insert_btn">Add column</button>
-          <input placeholder="name of the column" class="input_form_name" />
-          <select id="input-type" class="insert_btn">
-            <option value="TEXT">TEXT</option>
-            <option value="INTEGER">INTEGER</option>
-            <option value="REAL">REAL</option>
-          </select>
           <div class="table_component" role="region" tabindex="0">
             <table>
               <thead>
                 <tr>
                   <th>Column</th>
                   <th>Data Type</th>
+                  <th>Primary key</th>
+                  <th>Default value</th>
                 </tr>
               </thead>
               <tbody></tbody>
