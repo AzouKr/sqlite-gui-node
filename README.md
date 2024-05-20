@@ -13,6 +13,7 @@
 - [Arguments](#arguments)
 - [Updating the Package](#updating-the-package)
 - [Uninstallation](#uninstallation)
+- [Screenshots](#screenshots)
 
 ## Installation
 
@@ -88,6 +89,13 @@ If you need to uninstall sqlite-gui-node, you can do so by running:
 ```
 $ npm uninstall sqlite-gui-node
 ```
+
+## Screenshots
+
+![Display](figures/display_table.png)
+![Create table](figures/create_table.png)
+![Costum query](figures/costum_query.png)
+![Edit](figures/edit.png)
 
 ## Troubleshooting
 
