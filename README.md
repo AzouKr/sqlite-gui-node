@@ -1,5 +1,13 @@
 # SQLite GUI for Node.js Apps
 
+[![Version npm](https://img.shields.io/npm/v/sqlite-gui-node.svg?style=flat-square)](https://www.npmjs.com/package/sqlite-gui-node)
+[![npm Downloads](https://img.shields.io/npm/dm/sqlite-gui-node.svg?style=flat-square)](https://www.npmjs.com/package/sqlite-gui-node)
+
+<!--- [![build status](https://github.com/AzouKr/sqlite-gui-node/actions/workflows/ci.yml/badge.svg)](https://github.com/AzouKr/sqlite-gui-node/actions/workflows/ci.yml)--->
+<!---[![coverage status](https://coveralls.io/repos/github/AzouKr/sqlite-gui-node/badge.svg?branch=main)](https://coveralls.io/github/AzouKr/sqlite-gui-node?branch=main)--->
+
+[![NPM](https://nodei.co/npm/sqlite-gui-node.png?downloads=true&downloadRank=true)](https://nodei.co/npm/sqlite-gui-node/)
+
 - [Installation](#installation)
 - [Using a Custom Port](#using-a-custom-port)
 - [Arguments](#arguments)
@@ -22,7 +30,7 @@ $ npm install sqlite-gui-node
 
 After installing the package, you can import it in your index file of your project.
 
-```
+```js
 // import the SQLite DB that you use
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("app.db");
@@ -51,7 +59,7 @@ Once the GUI is started, you can access it via a web browser. By default, it run
 
 If you want to use a specific port, you can pass it as the second argument when initializing sqlite-gui-node:
 
-```
+```js
 // Pass the port as the second argument
 SqliteGuiNode(db, 3005).catch((err) => {
   console.error("Error starting the server:", err);

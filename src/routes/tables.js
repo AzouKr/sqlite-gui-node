@@ -10,6 +10,12 @@ const {
   checkColumnHasDefault,
 } = require("../Utils/displayTables");
 
+const {
+  generateInsertSQL,
+  generateUpdateSQL,
+  generateCreateTableSQL,
+} = require("../Utils/sqlGenerator");
+
 module.exports = function (db) {
   router.get("/", async (req, res) => {
     try {
@@ -55,7 +61,7 @@ module.exports = function (db) {
     try {
       // // Extract table name and data
       const { tablename, dataArray } = req.body;
-      const sql = await generateInsertSQL(tablename, dataArray);
+      const sql = await generateInsertSQL(db, tablename, dataArray);
       insertTable(db, sql)
         .then((response) => {
           res.status(200).json(response); // Changed variable name to avoid conflict
@@ -148,102 +154,6 @@ module.exports = function (db) {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
-  async function generateInsertSQL(tableName, data) {
-    // Extract field names
-    const columns = [];
-    const values = [];
-
-    // Process each item in data asynchronously
-    await Promise.all(
-      data.map(async (item) => {
-        const res = await checkColumnHasDefault(
-          db,
-          tableName,
-          item.type.toUpperCase(),
-          item.field
-        );
-        if (!res.bool) {
-          columns.push(item.field);
-          if (
-            item.type.toUpperCase() === "TEXT" ||
-            item.type.toUpperCase() === "BLOB"
-          ) {
-            if (item.value !== "") {
-              values.push(`'${item.value.replace(/'/g, "''")}'`); // Escape single quotes
-            }
-          } else {
-            if (item.value !== "") {
-              values.push(item.value);
-            }
-          }
-        }
-      })
-    );
-    // Form the SQL statement
-    const sql = `INSERT INTO ${tableName} (${columns.join(
-      ", "
-    )}) VALUES (${values.join(", ")});`;
-
-    return sql;
-  }
-
-  function generateUpdateSQL(tableName, data, id) {
-    // Extract field names and their corresponding values
-    const setClauses = data
-      .map((item) => {
-        let value;
-        if (item.value === null || item.value === "") {
-          value = "NULL";
-        } else if (item.type === "TEXT") {
-          value = `'${item.value.replace(/'/g, "''")}'`; // Escape single quotes
-        } else {
-          value = item.value;
-        }
-        return `${item.field} = ${value}`;
-      })
-      .join(", ");
-
-    // Form the SQL statement
-    const sql = `UPDATE ${tableName} SET ${setClauses} WHERE id = ${id};`;
-
-    return sql;
-  }
-
-  function generateCreateTableSQL(tableName, data) {
-    // Map through the data to generate column definitions
-    const columnDefinitions = data
-      .map((item) => {
-        let columnType;
-        switch (item.type) {
-          case "TEXT":
-            columnType = "TEXT";
-            break;
-          case "INTEGER":
-            columnType = "INTEGER";
-            break;
-          case "REAL":
-            columnType = "REAL";
-            break;
-          default:
-            throw new Error(`Unknown type: ${item.type}`);
-        }
-        let columnDefinition = `${item.name} ${columnType}`;
-        if (item.pk !== "") {
-          columnDefinition += ` ${item.pk}`;
-        }
-        if (item.default !== null && item.default !== undefined) {
-          columnDefinition += ` DEFAULT ${item.default}`;
-        }
-        return columnDefinition;
-      })
-      .join(", ");
-
-    // Form the SQL statement
-    const sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions});`;
-
-    return sql;
-  }
 
   return router;
 };
