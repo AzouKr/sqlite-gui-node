@@ -13,11 +13,6 @@
   overflow: auto;
 }
 
-.sidebar_logo {
-  height: 20vh;
-  width: 100%;
-}
-
 .sidebar_title {
   font-size: 4vh;
   font-family: "Roboto", sans-serif;
@@ -27,14 +22,24 @@
 }
 
 .sidebar_table_div,
-.sidebar_table_div_end,
-.sidebar_table_div_btn {
-  height: 10vh;
+.sidebar_table_div_end {
+  height: fit-content;
   width: 100%;
   display: flex;
   align-items: center;
   cursor: pointer;
   padding-left: 1vh;
+}
+
+.sidebar_table_div_btn {
+  height: fit-content;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding-left: 1vh;
+  margin-bottom: 5vh;
+  margin-top: 5vh;
 }
 
 .create_btn {
@@ -53,26 +58,22 @@
 
 .sidebar_table_div:hover {
   background-color: #252733;
-}
-
-.sidebar_table_div > img {
-  height: 5vh;
-  color: white;
-  margin-right: 2vh;
+  border-radius: 1vh;
 }
 
 .sidebar_table_div > h1 {
-  font-size: 4vh;
+  font-size: 3vh;
   font-family: "Roboto", sans-serif;
   font-weight: 400;
   font-style: normal;
   color: white;
+  padding-top: 1vh;
 }
 
 .right_side {
   height: 100vh;
   width: 100%;
-  margin-left: 40vh;
+  margin-left: 41vh;
 }
 
 .header {
@@ -104,7 +105,7 @@
   background-color: white;
   position: sticky;
   right: 0;
-  height: 10vh;
+  height: 5vh;
 }
 
 .action-icon {

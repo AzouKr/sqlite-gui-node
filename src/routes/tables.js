@@ -8,6 +8,8 @@ const {
   deleteFromTable,
   fetchRecord,
   checkColumnHasDefault,
+  runQuery,
+  runSelectQuery,
 } = require("../Utils/displayTables");
 
 const {
@@ -69,6 +71,53 @@ module.exports = function (db) {
         .catch((err) => {
           res.status(500).json(err);
         });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  router.post("/query", async (req, res) => {
+    try {
+      const { sqlQuery } = req.body;
+      const lowersqlQuery = sqlQuery.toLowerCase();
+      if (lowersqlQuery.slice(0, 6) === "select") {
+        runSelectQuery(db, lowersqlQuery)
+          .then((response) => {
+            if (lowersqlQuery.slice(0, 15) === "select count(*)") {
+              res.status(200).json({
+                type: "string",
+                data: "Count result is " + response.data[0]["count(*)"],
+              });
+            } else {
+              res.status(200).json({ type: "table", data: response.data });
+            }
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
+      } else {
+        runQuery(db, sqlQuery)
+          .then((response) => {
+            if (lowersqlQuery.slice(0, 6) === "update") {
+              res
+                .status(200)
+                .json({ type: "string", data: "Updated Successfully" });
+            }
+            if (lowersqlQuery.slice(0, 6) === "insert") {
+              res
+                .status(200)
+                .json({ type: "string", data: "Inserted Successfully" });
+            }
+            if (lowersqlQuery.slice(0, 6) === "delete") {
+              res
+                .status(200)
+                .json({ type: "string", data: "Deleted Successfully" });
+            }
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
+      }
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }

@@ -12,9 +12,9 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
       rel="stylesheet"
     />
-    <script src="/javascripts/insert.js"></script>
+    <script src="/javascripts/query.js"></script>
 
-    <title>Document</title>
+    <title>Costum Query</title>
   </head>
   <body>
     <div class="page_body">
@@ -39,9 +39,36 @@
       </div>
       <div class="right_side">
         <div class="main_body">
-          <div class="main_body_header">
-            <h1 class="body_title">Insert new row :</h1>
+          <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label"
+              >Execute your costume query here :</label
+            >
+            <button
+              style="position: absolute; right: 6vh"
+              type="button"
+              class="btn btn-success btn-sm"
+              id="runButton"
+            >
+              Run
+              <img
+                style="height: 2vh; margin-bottom: 0.2vh"
+                src="/icons/play.svg"
+              />
+            </button>
+            <textarea
+              style="margin-top: 2vh"
+              class="form-control"
+              id="queryTextarea"
+              rows="3"
+            ></textarea>
           </div>
+          <table class="table table-hover" id="resultTable">
+            <thead></thead>
+            <tbody>
+              <!-- Data will be inserted here -->
+            </tbody>
+          </table>
+          <p id="resultParagraph"></p>
         </div>
       </div>
     </div>

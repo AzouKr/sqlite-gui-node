@@ -21,13 +21,9 @@ function populateSidebar(tables) {
       const tableDiv = document.createElement("div");
       tableDiv.classList.add("sidebar_table_div");
 
-      const img = document.createElement("img");
-      img.src = "./icons/table.svg";
-
       const h1 = document.createElement("h1");
       h1.textContent = table.name;
 
-      tableDiv.appendChild(img);
       tableDiv.appendChild(h1);
 
       sidebar.appendChild(tableDiv);

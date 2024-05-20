@@ -97,6 +97,38 @@ function insertTable(db, sqlStatement) {
     });
   });
 }
+function runQuery(db, sqlStatement) {
+  return new Promise(function (resolve, reject) {
+    db.run(sqlStatement, function (error) {
+      if (error) {
+        logger.error("SQL Statement : " + sqlStatement);
+        logger.error(error.message);
+        reject({ bool: false, error: error.message });
+        return;
+      } else {
+        // console.log("Successfully inserted");
+        resolve({ bool: true });
+      }
+    });
+  });
+}
+
+function runSelectQuery(db, sqlStatement) {
+  return new Promise(function (resolve, reject) {
+    db.all(sqlStatement, function (error, rows) {
+      if (error) {
+        logger.error("SQL Statement : " + sqlStatement);
+        logger.error(error.message);
+        reject({ bool: false, error: error.message });
+        return;
+      } else {
+        // console.log(rows);
+        // logger.info("Successfully fetching");
+        resolve({ bool: true, data: rows });
+      }
+    });
+  });
+}
 
 function checkColumnHasDefault(db, tableName, columnType, columnName) {
   return new Promise(function (resolve, reject) {
@@ -166,4 +198,6 @@ module.exports = {
   deleteFromTable,
   fetchRecord,
   checkColumnHasDefault,
+  runQuery,
+  runSelectQuery,
 };

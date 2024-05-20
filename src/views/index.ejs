@@ -19,7 +19,7 @@
   <body>
     <div class="page_body">
       <div class="sidebar">
-        <h1 class="sidebar_title">Tables</h1>
+        <h1 style="text-align: center; color: white;" class="form-label fs-4 text">SQLite GUI</h1>
         <a style="text-decoration: none" href="/createtable">
           <div class="sidebar_table_div_btn">
             <button class="create_btn">Create</button>
@@ -28,6 +28,26 @@
       </div>
 
       <div class="right_side">
+        <nav style="position: fixed; width: 100%;" class="navbar navbar-expand-lg bg-body-tertiary">
+          <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/query">  <button type="button" class="btn btn-primary" data-bs-toggle="button">Custom query</button>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page">  <button style="opacity: 0.4; cursor: not-allowed; pointer-events: none;" type="button" class="btn btn-primary" data-bs-toggle="button">Import database</button>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page">  <button style="opacity: 0.4; cursor: not-allowed; pointer-events: none;" type="button" class="btn btn-primary" data-bs-toggle="button">Export database</button>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
         <div class="main_body">
           <div
             style="
