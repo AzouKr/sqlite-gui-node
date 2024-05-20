@@ -1,10 +1,13 @@
+const logger = require("./logger");
+
 function fetchAllTables(db) {
   return new Promise(function (resolve, reject) {
     db.all(
       "SELECT name FROM sqlite_master WHERE type='table'",
       function (error, rows) {
         if (error) {
-          console.log("Error while fetching tables");
+          logger.error("Error while fetching tables");
+          logger.error(error.message);
           reject({ bool: false, error: error.message });
           return;
         } else {
@@ -20,7 +23,8 @@ function fetchTable(db, table) {
   return new Promise(function (resolve, reject) {
     db.all(`SELECT * FROM ${table}`, function (error, rows) {
       if (error) {
-        console.log("Error while fetching tables");
+        logger.error("Error while fetching table");
+        logger.error(error.message);
         reject({ bool: false, error: error.message });
         return;
       } else {
@@ -34,7 +38,8 @@ function fetchRecord(db, table, id) {
   return new Promise(function (resolve, reject) {
     db.all(`SELECT * FROM ${table} WHERE id = ${id}`, function (error, rows) {
       if (error) {
-        console.log("Error while fetching tables");
+        logger.error("Error while fetching record");
+        logger.error(error.message);
         reject({ bool: false, error: error.message });
         return;
       } else {
@@ -49,7 +54,8 @@ function fetchTableInfo(db, table) {
   return new Promise(function (resolve, reject) {
     db.all(`PRAGMA table_info(${table})`, function (error, rows) {
       if (error) {
-        console.log("Error while fetching table info");
+        logger.error("Error while fetching table info");
+        logger.error(error.message);
         reject({ bool: false, error: error.message });
       } else {
         // Filter out the auto-increment column
@@ -77,11 +83,11 @@ function fetchTableInfo(db, table) {
 }
 
 function insertTable(db, sqlStatement) {
-  // console.log(sqlStatement);
   return new Promise(function (resolve, reject) {
     db.run(sqlStatement, function (error) {
       if (error) {
-        console.log("Error while inserting");
+        logger.error("SQL Statement : " + sqlStatement);
+        logger.error(error.message);
         reject({ bool: false, error: error.message });
         return;
       } else {
@@ -91,12 +97,57 @@ function insertTable(db, sqlStatement) {
     });
   });
 }
+
+function checkColumnHasDefault(db, tableName, columnType, columnName) {
+  return new Promise(function (resolve, reject) {
+    try {
+      // Construct the SQL query to check if the column has a default value
+      const sql = `
+              SELECT sql
+              FROM sqlite_master
+              WHERE type = 'table' AND name = '${tableName}'
+          `;
+
+      // Execute the SQL query
+      db.get(sql, [], (err, row) => {
+        if (err) {
+          reject({
+            bool: false,
+            message: "Error while executing query",
+            error: err.message,
+          });
+          return;
+        }
+
+        if (!row) {
+          resolve({ bool: false, message: "Table not found" });
+          return;
+        }
+        // Check if the SQL definition contains the column name and the word "DEFAULT"
+        const hasDefault = row.sql.includes(
+          `${columnName} ${columnType} DEFAULT`
+        );
+
+        // Return the result
+        resolve({ bool: hasDefault, message: "" });
+      });
+    } catch (error) {
+      reject({
+        bool: false,
+        message: "Error while executing query",
+        error: error.message,
+      });
+    }
+  });
+}
+
 function deleteFromTable(db, name, id) {
   // console.log(sqlStatement);
   return new Promise(function (resolve, reject) {
     db.run(`DELETE FROM ${name} WHERE id = ${id};`, function (error) {
       if (error) {
-        console.log("Error while inserting");
+        logger.error("Error while deleting");
+        logger.error(error.message);
         reject({ bool: false, error: error.message });
         return;
       } else {
@@ -114,4 +165,5 @@ module.exports = {
   fetchTableInfo,
   deleteFromTable,
   fetchRecord,
+  checkColumnHasDefault,
 };

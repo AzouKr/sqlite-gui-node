@@ -61,6 +61,11 @@ async function createForm() {
     );
     const tableName = tableNameInput.value;
 
+    if (rows.length < 2) {
+      alert("Please create at least 2 columns to the table");
+      return;
+    }
+
     if (!tableName) {
       alert("Please enter the name of the table");
       return;

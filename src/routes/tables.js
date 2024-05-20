@@ -7,6 +7,7 @@ const {
   fetchTableInfo,
   deleteFromTable,
   fetchRecord,
+  checkColumnHasDefault,
 } = require("../Utils/displayTables");
 
 module.exports = function (db) {
@@ -54,7 +55,7 @@ module.exports = function (db) {
     try {
       // // Extract table name and data
       const { tablename, dataArray } = req.body;
-      const sql = generateInsertSQL(tablename, dataArray);
+      const sql = await generateInsertSQL(tablename, dataArray);
       insertTable(db, sql)
         .then((response) => {
           res.status(200).json(response); // Changed variable name to avoid conflict
@@ -89,7 +90,6 @@ module.exports = function (db) {
       // // Extract table name and data
       const { tablename, dataArray, userId } = req.body;
       const sql = generateUpdateSQL(tablename, dataArray, userId);
-      console.log(sql);
       insertTable(db, sql)
         .then((response) => {
           res.status(200).json(response); // Changed variable name to avoid conflict
@@ -149,29 +149,37 @@ module.exports = function (db) {
     }
   });
 
-  function generateInsertSQL(tableName, data) {
+  async function generateInsertSQL(tableName, data) {
     // Extract field names
     const columns = [];
     const values = [];
 
-    data.forEach((item) => {
-      if (
-        item.value !== null &&
-        item.value !== undefined &&
-        item.value !== ""
-      ) {
-        columns.push(item.field);
-        if (
-          item.type.toUpperCase() === "TEXT" ||
-          item.type.toUpperCase() === "BLOB"
-        ) {
-          values.push(`'${item.value.replace(/'/g, "''")}'`); // Escape single quotes
-        } else {
-          values.push(item.value);
+    // Process each item in data asynchronously
+    await Promise.all(
+      data.map(async (item) => {
+        const res = await checkColumnHasDefault(
+          db,
+          tableName,
+          item.type.toUpperCase(),
+          item.field
+        );
+        if (!res.bool) {
+          columns.push(item.field);
+          if (
+            item.type.toUpperCase() === "TEXT" ||
+            item.type.toUpperCase() === "BLOB"
+          ) {
+            if (item.value !== "") {
+              values.push(`'${item.value.replace(/'/g, "''")}'`); // Escape single quotes
+            }
+          } else {
+            if (item.value !== "") {
+              values.push(item.value);
+            }
+          }
         }
-      }
-    });
-
+      })
+    );
     // Form the SQL statement
     const sql = `INSERT INTO ${tableName} (${columns.join(
       ", "

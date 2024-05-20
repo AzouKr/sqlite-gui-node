@@ -9,6 +9,7 @@
   padding: 2vh;
   background-color: #35374a;
   position: fixed;
+  overflow: auto;
 }
 
 .sidebar_logo {
@@ -24,6 +25,14 @@
 }
 
 .sidebar_table_div {
+  height: 10vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding-left: 1vh;
+}
+.sidebar_table_div_end {
   height: 10vh;
   width: 100%;
   display: flex;
@@ -123,6 +132,7 @@
   background-color: #eceff1;
   color: #000000;
   padding: 5px;
+  text-align: center;
 }
 
 .table_component td {

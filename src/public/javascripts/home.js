@@ -33,6 +33,10 @@ function populateSidebar(tables) {
     }
   });
 
+  const tableDiv = document.createElement("div");
+  tableDiv.classList.add("sidebar_table_div_end");
+  sidebar.appendChild(tableDiv);
+
   // Add event listener for table selection
   const tableDivs = document.querySelectorAll(".sidebar_table_div");
   tableDivs.forEach((div) => {
@@ -135,6 +139,7 @@ function displayTableData(data) {
         td.style.width = "10vw";
         tr.appendChild(td);
       });
+
       const editCell = document.createElement("td");
       const editIcon = document.createElement("img");
       editIcon.src = "./icons/edit.svg";
@@ -154,22 +159,27 @@ function displayTableData(data) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ tablename, id: row.id }),
+          body: JSON.stringify({
+            tablename,
+            id: row.id,
+          }),
         })
           .then((response) => {
             if (!response.ok) {
               throw new Error("Network response was not ok");
             }
-            location.reload();
+            // Remove the row from the table
+            tr.remove();
           })
           .catch((error) => {
-            console.error("Error inserting data:", error);
+            console.error("Error deleting data:", error);
           });
       };
       tr.appendChild(deleteCell);
 
       tbody.appendChild(tr);
     });
+
     table.appendChild(tbody);
 
     tableComponentDiv.appendChild(table);

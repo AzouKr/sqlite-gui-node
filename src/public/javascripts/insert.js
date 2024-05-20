@@ -63,7 +63,7 @@ function displayTableData(fields) {
 
     const input = document.createElement("input");
     input.classList.add("input_form");
-    input.type = getInputType(field.type);
+    input.dataset.fieldType = field.type; // Store field type in dataset
     input.placeholder = field.field;
     mainBodyDiv.appendChild(input);
 
@@ -74,34 +74,39 @@ function displayTableData(fields) {
   const insertButton = document.createElement("button");
   insertButton.textContent = "Insert";
   insertButton.classList.add("insert_btn");
-  insertButton.addEventListener("click", () => {
+  insertButton.addEventListener("click", async () => {
     const inputs = document.querySelectorAll(".input_form");
     const dataArray = Array.from(inputs).map((input) => {
       const value = input.value;
+      const type = input.dataset.fieldType; // Retrieve field type from dataset
       return {
         field: input.placeholder,
         value: value,
-        type: input.type,
+        type: type, // Use field type instead of input type
       };
     });
-    // Send POST request to API
-    fetch("/api/tables/insert", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ tablename, dataArray }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        // Handle response if needed
-        window.location.href = `/`;
-      })
-      .catch((error) => {
-        console.error("Error inserting data:", error);
+
+    try {
+      const response = await fetch("/api/tables/insert", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tablename, dataArray }),
       });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      // Handle response if needed
+      window.location.href = `/`;
+    } catch (error) {
+      console.error(error);
+      alert(
+        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info"
+      );
+    }
   });
 
   mainBodyDiv.appendChild(insertButton);
