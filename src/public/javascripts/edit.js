@@ -53,7 +53,7 @@ function displayTableData(fields, dataObject) {
   headerDiv.classList.add("main_body_header");
 
   const bodyTitle = document.createElement("h1");
-  bodyTitle.classList.add("body_title");
+  bodyTitle.classList.add("form-label");
   bodyTitle.textContent = "Edit the row :";
   headerDiv.appendChild(bodyTitle);
 
@@ -61,7 +61,7 @@ function displayTableData(fields, dataObject) {
 
   fields.forEach((field) => {
     const label = document.createElement("label");
-    label.classList.add("input_label");
+    label.classList.add("form-label");
     label.textContent = field.field;
     mainBodyDiv.appendChild(label);
 
@@ -70,7 +70,7 @@ function displayTableData(fields, dataObject) {
 
     const input = document.createElement("input");
     input.type = getInputType(field.type);
-    input.classList.add("input_form");
+    input.classList.add("form-control");
     input.id = `input-${field.field}`; // Set a unique ID for each input
     input.dataset.field = field.field; // Store the field name
     input.dataset.type = field.type; // Store the field type
@@ -89,10 +89,10 @@ function displayTableData(fields, dataObject) {
 
   // Create button for editing
   const editButton = document.createElement("button");
-  editButton.textContent = "Edit";
+  editButton.textContent = "Edit row";
   editButton.classList.add("insert_btn"); // Apply the class for styling
   editButton.addEventListener("click", () => {
-    const inputs = document.querySelectorAll(".input_form");
+    const inputs = document.querySelectorAll(".form-control");
     const dataArray = Array.from(inputs).map((input) => {
       let value = input.value;
       const type = input.dataset.type;

@@ -5,7 +5,8 @@
 
 .sidebar {
   height: 100vh;
-  width: 40vh;
+  width: 20vw;
+  min-width: 40vh;
   padding: 2vh;
   background-color: #35374a;
   position: fixed;
@@ -16,6 +17,7 @@
   height: 20vh;
   width: 100%;
 }
+
 .sidebar_title {
   font-size: 4vh;
   font-family: "Roboto", sans-serif;
@@ -24,22 +26,8 @@
   color: white;
 }
 
-.sidebar_table_div {
-  height: 10vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding-left: 1vh;
-}
-.sidebar_table_div_end {
-  height: 10vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding-left: 1vh;
-}
+.sidebar_table_div,
+.sidebar_table_div_end,
 .sidebar_table_div_btn {
   height: 10vh;
   width: 100%;
@@ -57,6 +45,7 @@
   border-radius: 1vh;
   color: white;
 }
+
 .create_btn:hover {
   background-color: #2929ea;
   cursor: pointer;
@@ -71,6 +60,7 @@
   color: white;
   margin-right: 2vh;
 }
+
 .sidebar_table_div > h1 {
   font-size: 4vh;
   font-family: "Roboto", sans-serif;
@@ -82,70 +72,56 @@
 .right_side {
   height: 100vh;
   width: 100%;
-  margin-left: 44vh;
+  margin-left: 40vh;
 }
 
 .header {
   height: 5vh;
   width: 100%;
 }
+
 .main_body {
-  min-height: 90vh;
-  width: 94%;
+  min-height: 100vh;
+  width: 80vw;
   padding: 5vh;
   background-color: #e9e9e9;
 }
 
+.table_container {
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  position: relative;
+}
+
 .table_component {
-  overflow: auto;
-  width: 73vw;
-  overflow: auto;
+  flex-grow: 1;
+  overflow-x: auto;
 }
 
-.table_component table {
-  border: 1px solid #dededf;
-  height: 100%;
-  width: fit-content;
-  border-collapse: collapse;
-  border-spacing: 1px;
-  text-align: left;
-  font-size: 2vh;
-  font-family: "Roboto", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  color: black;
+.fixed-table {
+  flex-shrink: 0;
+  background-color: white;
+  position: sticky;
+  right: 0;
+  height: 10vh;
 }
 
-.table_component caption {
-  caption-side: top;
-  text-align: left;
-  font-size: 4vh;
-  font-family: "Roboto", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  color: black;
-  padding-bottom: 5vh;
-}
-
-.table_component th {
-  border: 1px solid #dededf;
-  background-color: #eceff1;
-  color: #000000;
-  padding: 5px;
-  text-align: center;
-}
-
-.table_component td {
-  border: 1px solid #dededf;
-  background-color: #ffffff;
-  color: #000000;
-  min-width: 5vw;
-  text-align: center;
-}
-
-.table_component td img {
-  height: 2vh;
+.action-icon {
   cursor: pointer;
+}
+
+.table {
+  white-space: nowrap;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
 }
 
 .main_body_header {
@@ -153,13 +129,12 @@
   width: 100%;
   display: flex;
   align-items: center;
-  padding-bottom: 5vh;
+  padding-top: 10vh;
+  padding-bottom: 10vh;
 }
 
 .insert_btn {
-  width: fit-content;
-  padding-left: 2vh;
-  padding-right: 2vh;
+  padding: 0 2vh;
   height: 5vh;
   background-color: #79bfb3;
   border: none;
@@ -169,8 +144,8 @@
 }
 
 .insert_btn:hover {
-  cursor: pointer;
   background-color: #549f92;
+  cursor: pointer;
 }
 
 .delete_btn {
@@ -184,15 +159,14 @@
 }
 
 .delete_btn:hover {
-  cursor: pointer;
   background-color: #ca0404;
+  cursor: pointer;
 }
 
 .body_title {
   font-size: 4vh;
   font-family: "Roboto", sans-serif;
   font-weight: 400;
-  font-style: normal;
   color: black;
 }
 
@@ -200,7 +174,6 @@
   font-size: 3vh;
   font-family: "Roboto", sans-serif;
   font-weight: 400;
-  font-style: normal;
   color: black;
 }
 
@@ -209,59 +182,57 @@
 }
 
 .create_box {
-  height: 13vh;
-  width: fit-content;
   margin: 2vh;
 }
 
-.create_box_top {
-  height: 5vh;
-  min-width: 10vh;
+.create_box_top,
+.create_box_bottom {
   display: flex;
   align-items: center;
   padding-left: 1vh;
 }
+
+.create_box_top {
+  height: 2vh;
+  min-width: 10vh;
+}
+
 .create_box_bottom {
   min-height: 8vh;
   min-width: 10vh;
-  display: flex;
-  align-items: center;
 }
 
 .input_box {
   font-size: 2.5vh;
   font-family: "Roboto", sans-serif;
   font-weight: 400;
-  font-style: normal;
   color: black;
 }
 
 .check_box {
   transform: scale(1.3);
 }
+
 .checkbox_label {
   font-size: 2.8vh;
   font-family: "Roboto", sans-serif;
   font-weight: 400;
-  font-style: normal;
   color: black;
 }
 
-.input_form {
-  height: 4vh;
-  width: 80%;
-  border-radius: 1vh;
-  border: none;
-  margin-top: 1vh;
-  margin-bottom: 1vh;
-  padding: 1vh;
-}
+.input_form,
 .input_form_name {
   height: 4vh;
-  width: 30vh;
   border-radius: 1vh;
   border: none;
-  margin-top: 1vh;
-  margin-bottom: 1vh;
+  margin: 1vh 0;
   padding: 1vh;
+}
+
+.input_form {
+  width: 80%;
+}
+
+.input_form_name {
+  width: 30vh;
 }

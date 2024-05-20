@@ -46,7 +46,7 @@ function displayTableData(fields) {
   headerDiv.classList.add("main_body_header");
 
   const bodyTitle = document.createElement("h1");
-  bodyTitle.classList.add("body_title");
+  bodyTitle.classList.add("form-label");
   bodyTitle.textContent = "Insert new row :";
   headerDiv.appendChild(bodyTitle);
 
@@ -54,7 +54,7 @@ function displayTableData(fields) {
 
   fields.forEach((field) => {
     const label = document.createElement("label");
-    label.classList.add("input_label");
+    label.classList.add("form-label");
     label.textContent = field.field;
     mainBodyDiv.appendChild(label);
 
@@ -62,7 +62,7 @@ function displayTableData(fields) {
     mainBodyDiv.appendChild(br);
 
     const input = document.createElement("input");
-    input.classList.add("input_form");
+    input.classList.add("form-control");
     input.dataset.fieldType = field.type; // Store field type in dataset
     input.placeholder = field.field;
     mainBodyDiv.appendChild(input);
@@ -75,7 +75,7 @@ function displayTableData(fields) {
   insertButton.textContent = "Insert";
   insertButton.classList.add("insert_btn");
   insertButton.addEventListener("click", async () => {
-    const inputs = document.querySelectorAll(".input_form");
+    const inputs = document.querySelectorAll(".form-control");
     const dataArray = Array.from(inputs).map((input) => {
       const value = input.value;
       const type = input.dataset.fieldType; // Retrieve field type from dataset

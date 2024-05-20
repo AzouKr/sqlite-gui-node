@@ -11,6 +11,9 @@ app.use(express.static(path.join(__dirname, "src/public")));
 app.use(bodyParser.json());
 
 // Routes
+app.get("/test", (req, res) => {
+  res.render("try", { title: "Home Page" });
+});
 app.get("", (req, res) => {
   res.render("index", { title: "Home Page" });
 });

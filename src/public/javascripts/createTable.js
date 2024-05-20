@@ -3,15 +3,11 @@ async function createForm() {
   const createButton = document.getElementById("create_table_btn");
 
   insertButton.onclick = () => {
-    const fieldNameInput = document.querySelector(
-      ".main_body .input_form_name"
-    );
+    const fieldNameInput = document.getElementById("input_form_name");
     const fieldName = fieldNameInput.value;
     const inputType = document.getElementById("input-type").value;
     const inputPk = document.getElementById("input-pk").value;
-    const defaultValueInput = document.querySelector(
-      ".create_box_bottom input[placeholder='Leave it empty for no default value']"
-    );
+    const defaultValueInput = document.getElementById("default-input");
     const defaultValue = defaultValueInput.value || "None";
     const tableDataTbody = document.querySelector(
       ".main_body .table_component tbody"
@@ -56,13 +52,11 @@ async function createForm() {
     const rows = document.querySelectorAll(
       ".main_body .table_component tbody tr"
     );
-    const tableNameInput = document.querySelector(
-      ".main_body input.input_form"
-    );
+    const tableNameInput = document.getElementById("table-name");
     const tableName = tableNameInput.value;
 
     if (rows.length < 2) {
-      alert("Please create at least 2 columns to the table");
+      alert("Please create at least 2 columns for the table");
       return;
     }
 

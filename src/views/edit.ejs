@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="/stylesheets/main.css" />
+    <link rel="stylesheet" href="/stylesheets/main.css.map" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,24 +18,23 @@
   <body>
     <div class="page_body">
       <div class="sidebar">
-        <div class=""></div>
-        <a
-          style="text-decoration: none; display: flex; align-items: center"
-          href="/"
+        <div
+          style="
+            height: 10vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
         >
-          <img style="height: 3vh; margin-right: 1vh" src="/icons/return.svg" />
-          <h1 style="font-size: 3vh" class="sidebar_title">Return</h1></a
-        >
+          <a href="/" class="btn btn-primary">Go back to homepage</a>
+        </div>
       </div>
       <div class="right_side">
         <div class="main_body">
           <div class="main_body_header">
             <h1 class="body_title">Edit the row :</h1>
           </div>
-          <label class="input_label">Name</label><br />
-          <input class="input_form" />
-          <br />
-          <button class="insert_btn">Insert</button>
         </div>
       </div>
     </div>

@@ -1,7 +1,8 @@
 let tablename;
+
 async function fetchData() {
   try {
-    const response = await fetch("/api/tables"); // Update with your actual endpoint
+    const response = await fetch("/api/tables");
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -37,7 +38,6 @@ function populateSidebar(tables) {
   tableDiv.classList.add("sidebar_table_div_end");
   sidebar.appendChild(tableDiv);
 
-  // Add event listener for table selection
   const tableDivs = document.querySelectorAll(".sidebar_table_div");
   tableDivs.forEach((div) => {
     div.addEventListener("click", function () {
@@ -71,89 +71,129 @@ function displayTableData(data) {
   const headerDiv = document.createElement("div");
   headerDiv.classList.add("main_body_header");
 
-  if (data.length > 0) {
-    const insertButton = document.createElement("button");
-    insertButton.textContent = "Insert";
-    insertButton.classList.add("insert_btn");
-    // Add event listener to button
-    insertButton.onclick = () => {
-      window.location.href = `/insert/${tablename}`;
-    };
-    headerDiv.appendChild(insertButton);
+  const insertButton = document.createElement("button");
+  insertButton.textContent = "Insert";
+  insertButton.classList.add("insert_btn");
+  insertButton.onclick = () => {
+    window.location.href = `/insert/${tablename}`;
+  };
+  headerDiv.appendChild(insertButton);
 
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete table";
-    deleteButton.classList.add("delete_btn");
-    // Add event listener to button
-    deleteButton.onclick = () => {
-      fetch("/api/tables/table/delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tablename }),
+  const deleteButton = document.createElement("button");
+  deleteButton.textContent = "Delete table";
+  deleteButton.classList.add("delete_btn");
+  deleteButton.onclick = () => {
+    fetch("/api/tables/table/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tablename }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        location.reload();
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          location.reload();
-        })
-        .catch((error) => {
-          console.error("Error inserting data:", error);
-        });
-    };
-    headerDiv.appendChild(deleteButton);
-    mainBodyDiv.appendChild(headerDiv);
+      .catch((error) => {
+        console.error("Error deleting table:", error);
+      });
+  };
+  headerDiv.appendChild(deleteButton);
+  mainBodyDiv.appendChild(headerDiv);
+
+  const tableTitle = document.createElement("h1");
+  tableTitle.classList.add("form-label", "fs-4", "text");
+  tableTitle.textContent = tablename;
+  mainBodyDiv.appendChild(tableTitle);
+
+  const tableContainer = document.createElement("div");
+  tableContainer.classList.add("table_container");
+
+  if (data.length > 0) {
     const tableComponentDiv = document.createElement("div");
     tableComponentDiv.classList.add("table_component");
     tableComponentDiv.setAttribute("role", "region");
     tableComponentDiv.setAttribute("tabindex", "0");
 
     const table = document.createElement("table");
-
-    const caption = document.createElement("caption");
-    caption.textContent = tablename;
-    table.appendChild(caption);
+    table.classList.add("table", "table-striped", "table-hover");
 
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
     Object.keys(data[0]).forEach((key) => {
       const th = document.createElement("th");
+      th.scope = "col";
       th.textContent = key;
       headerRow.appendChild(th);
     });
-    const th = document.createElement("th");
-    headerRow.appendChild(th);
-    const th1 = document.createElement("th");
-    headerRow.appendChild(th1);
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
     data.forEach((row) => {
       const tr = document.createElement("tr");
-      Object.values(row).forEach((value) => {
-        const td = document.createElement("td");
-        td.textContent = value;
-        td.style.width = "10vw";
-        tr.appendChild(td);
-      });
 
-      const editCell = document.createElement("td");
+      Object.values(row).forEach((value, index) => {
+        const td = document.createElement("td");
+        if (index === 0) {
+          const th = document.createElement("th");
+          th.scope = "row";
+          th.textContent = value;
+          tr.appendChild(th);
+          tr.setAttribute("id", value);
+        } else {
+          td.textContent = value;
+          tr.appendChild(td);
+        }
+      });
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    tableComponentDiv.appendChild(table);
+    tableContainer.appendChild(tableComponentDiv);
+
+    const fixedTableDiv = document.createElement("div");
+    fixedTableDiv.classList.add("fixed-table");
+
+    const fixedTable = document.createElement("table");
+    fixedTable.classList.add("table", "table-striped", "table-hover");
+
+    const fixedThead = document.createElement("thead");
+    const fixedHeaderRow = document.createElement("tr");
+    const editTh = document.createElement("th");
+    editTh.scope = "col";
+    editTh.textContent = "Edit";
+    fixedHeaderRow.appendChild(editTh);
+    const deleteTh = document.createElement("th");
+    deleteTh.scope = "col";
+    deleteTh.textContent = "Delete";
+    fixedHeaderRow.appendChild(deleteTh);
+    fixedThead.appendChild(fixedHeaderRow);
+    fixedTable.appendChild(fixedThead);
+
+    const fixedTbody = document.createElement("tbody");
+    data.forEach((row) => {
+      const fixedTr = document.createElement("tr");
+      const editTd = document.createElement("td");
       const editIcon = document.createElement("img");
       editIcon.src = "./icons/edit.svg";
-      editCell.appendChild(editIcon);
-      editCell.onclick = () => {
+      editIcon.classList.add("action-icon");
+      editIcon.style.height = "2vh";
+      editIcon.onclick = () => {
         window.location.href = `/edit/${tablename}/${row.id}`;
       };
-      tr.appendChild(editCell);
+      editTd.appendChild(editIcon);
+      fixedTr.appendChild(editTd);
 
-      const deleteCell = document.createElement("td");
+      const deleteTd = document.createElement("td");
       const deleteIcon = document.createElement("img");
       deleteIcon.src = "./icons/delete.svg";
-      deleteCell.appendChild(deleteIcon);
-      deleteCell.onclick = () => {
+      deleteIcon.classList.add("action-icon");
+      deleteIcon.style.height = "2vh";
+      deleteIcon.onclick = () => {
         fetch("/api/tables/delete", {
           method: "POST",
           headers: {
@@ -168,64 +208,33 @@ function displayTableData(data) {
             if (!response.ok) {
               throw new Error("Network response was not ok");
             }
-            // Remove the row from the table
+            const tr = document.getElementById(row.id);
             tr.remove();
+            fixedTr.remove();
           })
           .catch((error) => {
             console.error("Error deleting data:", error);
           });
       };
-      tr.appendChild(deleteCell);
-
-      tbody.appendChild(tr);
+      deleteTd.appendChild(deleteIcon);
+      fixedTr.appendChild(deleteTd);
+      fixedTbody.appendChild(fixedTr);
     });
 
-    table.appendChild(tbody);
+    fixedTable.appendChild(fixedTbody);
+    fixedTableDiv.appendChild(fixedTable);
+    tableContainer.appendChild(fixedTableDiv);
 
-    tableComponentDiv.appendChild(table);
-    mainBodyDiv.appendChild(tableComponentDiv);
+    mainBodyDiv.appendChild(tableContainer);
   } else {
-    const insertButton = document.createElement("button");
-    insertButton.textContent = "Insert";
-    insertButton.classList.add("insert_btn");
-    // Add event listener to button
-    insertButton.onclick = () => {
-      window.location.href = `/insert/${tablename}`;
-    };
-    headerDiv.appendChild(insertButton);
-
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete table";
-    deleteButton.classList.add("delete_btn");
-    // Add event listener to button
-    deleteButton.onclick = () => {
-      fetch("/api/tables/table/delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tablename }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          location.reload();
-        })
-        .catch((error) => {
-          console.error("Error inserting data:", error);
-        });
-    };
-    headerDiv.appendChild(deleteButton);
-    mainBodyDiv.appendChild(headerDiv);
     const h1 = document.createElement("h1");
-    h1.classList.add("text-white", "text-center", "text-[2vh]");
+    h1.style.color = "black";
+    h1.style.textAlign = "center";
     h1.textContent = "No data available for this table.";
     mainBodyDiv.appendChild(h1);
   }
 }
 
-// Call fetchTables when the page loads
 document.addEventListener("DOMContentLoaded", fetchData);
 
 document.getElementById("add-input").addEventListener("click", function () {
@@ -249,5 +258,4 @@ document.getElementById("get-values").addEventListener("click", function () {
   inputs.forEach((input) => {
     values.push({ type: input.type, value: input.value });
   });
-  console.log(values);
 });

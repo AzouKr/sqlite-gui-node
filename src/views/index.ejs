@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="/stylesheets/main.css" />
+    <link rel="stylesheet" href="/stylesheets/main.css.map" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -18,7 +20,7 @@
     <div class="page_body">
       <div class="sidebar">
         <h1 class="sidebar_title">Tables</h1>
-        <a href="/createtable">
+        <a style="text-decoration: none" href="/createtable">
           <div class="sidebar_table_div_btn">
             <button class="create_btn">Create</button>
           </div>
@@ -27,7 +29,18 @@
 
       <div class="right_side">
         <div class="main_body">
-          <h1 class="body_title">Select Table to View it</h1>
+          <div
+            style="
+              height: 70vh;
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <h1 style="align-items: center" class="form-label fs-1 text">
+              Select Table to View it
+            </h1>
         </div>
       </div>
     </div>
