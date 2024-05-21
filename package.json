@@ -1,11 +1,13 @@
 {
   "name": "sqlite-gui-node",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "GUI for Node js SQLite databases",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "nodemon app.js",
-    "test": "jest src/tests"
+    "start": "nodemon dist/app.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "test": "jest src/tests",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -17,7 +19,12 @@
     "Node js",
     "Node",
     "Interface",
-    "SQL"
+    "SQL",
+    "Mysql",
+    "database",
+    "Query",
+    "Queries",
+    "Typescript"
   ],
   "author": "AZOUKR",
   "license": "MIT",
@@ -35,7 +42,16 @@
   },
   "homepage": "https://github.com/AzouKr/sqlite-gui#readme",
   "devDependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/preset-env": "^7.24.5",
+    "@babel/preset-typescript": "^7.24.1",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.12",
     "jest": "^29.7.0",
-    "supertest": "^7.0.0"
+    "supertest": "^7.0.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
   }
 }
