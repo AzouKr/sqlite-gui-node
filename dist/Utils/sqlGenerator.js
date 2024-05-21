@@ -36,7 +36,7 @@ function generateInsertSQL(db, tableName, data) {
             }
         })));
         // Form the SQL statement
-        const sql = `INSERT INTO <span class="math-inline">\{tableName\} \(</span>{columns.join(", ")}) VALUES (${values.join(", ")});`;
+        const sql = `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${values.join(", ")});`;
         return sql;
     });
 }
