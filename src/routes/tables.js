@@ -10,6 +10,8 @@ const {
   checkColumnHasDefault,
   runQuery,
   runSelectQuery,
+  fetchQueries,
+  insertQuery,
 } = require("../Utils/displayTables");
 
 const {
@@ -24,6 +26,31 @@ module.exports = function (db) {
       fetchAllTables(db).then((tables) => {
         res.status(200).json(tables); // Changed variable name to avoid conflict
       });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  router.get("/local/query", async (req, res) => {
+    try {
+      fetchQueries().then((tables) => {
+        res.status(200).json(tables); // Changed variable name to avoid conflict
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  router.post("/local/query", async (req, res) => {
+    try {
+      // // Extract table name and data
+      const { name, sqlStatement } = req.body;
+      insertQuery(name, sqlStatement)
+        .then((response) => {
+          res.status(200).json(response); // Changed variable name to avoid conflict
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+        });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
@@ -76,6 +103,17 @@ module.exports = function (db) {
     }
   });
 
+  router.post("/generate/insert", async (req, res) => {
+    try {
+      // // Extract table name and data
+      const { tablename, dataArray } = req.body;
+      const sql = await generateInsertSQL(db, tablename, dataArray);
+      res.status(200).json(sql);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   router.post("/query", async (req, res) => {
     try {
       const { sqlQuery } = req.body;
@@ -113,6 +151,11 @@ module.exports = function (db) {
                 .status(200)
                 .json({ type: "string", data: "Deleted Successfully" });
             }
+            if (lowersqlQuery.slice(0, 6) === "create") {
+              res
+                .status(200)
+                .json({ type: "string", data: "Created Successfully" });
+            }
           })
           .catch((err) => {
             res.status(500).json(err);
@@ -139,6 +182,16 @@ module.exports = function (db) {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+  router.post("/generate/create", async (req, res) => {
+    try {
+      // // Extract table name and data
+      const { tableName, data } = req.body;
+      const sql = generateCreateTableSQL(tableName, data);
+      res.status(200).json(sql);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
   router.post("/update", async (req, res) => {
     try {
@@ -152,6 +205,17 @@ module.exports = function (db) {
         .catch((err) => {
           res.status(500).json(err);
         });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  router.post("/generate/update", async (req, res) => {
+    try {
+      // // Extract table name and data
+      const { tablename, dataArray, userId } = req.body;
+      const sql = generateUpdateSQL(tablename, dataArray, userId);
+      res.status(200).json(sql);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }

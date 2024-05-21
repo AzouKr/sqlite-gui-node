@@ -1,6 +1,7 @@
 async function createForm() {
   const insertButton = document.getElementById("insert_btn");
   const createButton = document.getElementById("create_table_btn");
+  const queryButton = document.getElementById("query_table_btn");
 
   insertButton.onclick = () => {
     const fieldNameInput = document.getElementById("input_form_name");
@@ -101,6 +102,74 @@ async function createForm() {
       .catch((error) => {
         console.error("Error creating table:", error);
       });
+  };
+
+  queryButton.onclick = async () => {
+    const rows = document.querySelectorAll(
+      ".main_body .table_component tbody tr"
+    );
+    const tableNameInput = document.getElementById("table-name");
+    const tableName = tableNameInput.value;
+
+    if (rows.length < 2) {
+      alert("Please create at least 2 columns for the table");
+      return;
+    }
+
+    if (!tableName) {
+      alert("Please enter the name of the table");
+      return;
+    }
+
+    const data = Array.from(rows).map((row) => {
+      const cells = row.querySelectorAll("td");
+      let defaultValue = cells[3].innerText;
+
+      // Check if default value is a number (integer or real)
+      if (!isNaN(defaultValue) && defaultValue !== "None") {
+        defaultValue = Number(defaultValue);
+      } else if (defaultValue === "None") {
+        defaultValue = null;
+      }
+
+      return {
+        name: cells[0].innerText,
+        type: cells[1].innerText,
+        pk: cells[2].innerText === "YES" ? "PRIMARY KEY AUTOINCREMENT" : "",
+        default: defaultValue,
+      };
+    });
+
+    try {
+      const response = await fetch("/api/tables/generate/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tableName, data }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Handle response if needed
+          //window.location.href = `/`;
+          // console.log(data);
+          const textarea = document.createElement("textarea");
+          textarea.setAttribute("readonly", true);
+          textarea.style.marginTop = "2vh";
+          textarea.style.width = "100%";
+          textarea.style.padding = "1vh";
+          textarea.setAttribute("id", "queryTextarea");
+          textarea.setAttribute("rows", "3");
+          textarea.textContent = data;
+          const divarea = document.getElementById("textare_container");
+          divarea.appendChild(textarea);
+        });
+    } catch (error) {
+      console.error(error);
+      alert(
+        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info"
+      );
+    }
   };
 }
 

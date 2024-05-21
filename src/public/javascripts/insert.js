@@ -110,4 +110,57 @@ function displayTableData(fields) {
   });
 
   mainBodyDiv.appendChild(insertButton);
+
+  const getQueryButton = document.createElement("button");
+  getQueryButton.textContent = "Get query";
+  getQueryButton.classList.add("insert_btn");
+  getQueryButton.addEventListener("click", async () => {
+    const inputs = document.querySelectorAll(".form-control");
+    const dataArray = Array.from(inputs).map((input) => {
+      const value = input.value;
+      const type = input.dataset.fieldType; // Retrieve field type from dataset
+      return {
+        field: input.placeholder,
+        value: value,
+        type: type, // Use field type instead of input type
+      };
+    });
+
+    try {
+      const response = await fetch("/api/tables/generate/insert", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tablename, dataArray }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Handle response if needed
+          //window.location.href = `/`;
+          // console.log(data);
+          const textarea = document.createElement("textarea");
+          textarea.setAttribute("readonly", true);
+          textarea.style.marginTop = "2vh";
+          textarea.style.width = "100%";
+          textarea.style.padding = "1vh";
+          textarea.setAttribute("id", "queryTextarea");
+          textarea.setAttribute("rows", "3");
+          textarea.textContent = data;
+          const divarea = document.getElementById("textare_container");
+          divarea.appendChild(textarea);
+        });
+    } catch (error) {
+      console.error(error);
+      alert(
+        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info"
+      );
+    }
+  });
+
+  mainBodyDiv.appendChild(getQueryButton);
+  const textareaContainer = document.createElement("div");
+  textareaContainer.style.width = "100%";
+  textareaContainer.setAttribute("id", "textare_container");
+  mainBodyDiv.appendChild(textareaContainer);
 }

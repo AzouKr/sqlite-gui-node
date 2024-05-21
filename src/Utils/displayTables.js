@@ -1,4 +1,77 @@
+const sqlite3 = require("sqlite3").verbose();
+const local = new sqlite3.Database("./src/local.db");
+
 const logger = require("./logger");
+
+function InitializeDB() {
+  local.serialize(() => {
+    local.get(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='query'",
+      (err, row) => {
+        if (err) {
+          // Handle error
+          logger.error("Error checking for query:", err.message);
+          return;
+        }
+
+        if (!row) {
+          local.run(
+            `
+            CREATE TABLE IF NOT EXISTS query (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT,
+              sqlstatement TEXT
+          )
+        `,
+            (err) => {
+              if (err) {
+                // Handle error
+                logger.error("Error creating query:", err.message);
+                return;
+              }
+            }
+          );
+        }
+      }
+    );
+  });
+}
+
+function insertQuery(name, sqlStatement) {
+  return new Promise(function (resolve, reject) {
+    local.run(
+      `INSERT INTO query (name, sqlstatement) VALUES (? , ?)`,
+      [name, sqlStatement],
+      function (error) {
+        if (error) {
+          logger.error("SQL Statement : " + sqlStatement);
+          logger.error(error.message);
+          reject({ bool: false, error: error.message });
+          return;
+        } else {
+          // console.log("Successfully inserted");
+          resolve({ bool: true });
+        }
+      }
+    );
+  });
+}
+
+function fetchQueries() {
+  return new Promise(function (resolve, reject) {
+    local.all(`SELECT * FROM query`, function (error, rows) {
+      if (error) {
+        logger.error("Error while fetching table");
+        logger.error(error.message);
+        reject({ bool: false, error: error.message });
+        return;
+      } else {
+        // console.log("Successfully fetched tables");
+        resolve({ bool: true, data: rows });
+      }
+    });
+  });
+}
 
 function fetchAllTables(db) {
   return new Promise(function (resolve, reject) {
@@ -34,6 +107,7 @@ function fetchTable(db, table) {
     });
   });
 }
+
 function fetchRecord(db, table, id) {
   return new Promise(function (resolve, reject) {
     db.all(`SELECT * FROM ${table} WHERE id = ${id}`, function (error, rows) {
@@ -200,4 +274,7 @@ module.exports = {
   checkColumnHasDefault,
   runQuery,
   runSelectQuery,
+  InitializeDB,
+  insertQuery,
+  fetchQueries,
 };

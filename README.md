@@ -74,6 +74,29 @@ SqliteGuiNode(db, 3005).catch((err) => {
 | db       | `sqlite3.Database` | The file of your SQLite database.                                        |
 | port     | number             | (Optional) The port on which the GUI server will run. Default is `8080`. |
 
+## Features
+
+### 1. CRUD Operations
+
+Perform Create, Read, Update, and Delete operations on your SQLite databases with ease. Our GUI simplifies the process, making database management straightforward and efficient.
+
+- **Create**: Add new records to your database tables.
+- **Read**: Retrieve and view data from your database.
+- **Update**: Modify existing records.
+- **Delete**: Remove records from your database.
+
+### 2. Write Custom Queries
+
+Unleash the full power of SQL by writing your own custom queries, our GUI supports it all.
+
+### 3. Save Custom Queries
+
+Save your frequently used custom queries for quick access and reuse. This feature helps you streamline your workflow by keeping your important queries organized and readily available.
+
+### 4. Generate Query Code Using GUI
+
+Generate query code directly from the GUI, saving you time and reducing the risk of syntax errors. Simply design your query using our intuitive interface, and let the GUI generate the corresponding SQL code for you.
+
 ## Updating the Package
 
 To update `sqlite-gui-node` to the latest version, you can run:

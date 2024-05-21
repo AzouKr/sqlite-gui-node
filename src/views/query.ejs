@@ -13,7 +13,6 @@
       rel="stylesheet"
     />
     <script src="/javascripts/query.js"></script>
-
     <title>Costum Query</title>
   </head>
   <body>
@@ -41,7 +40,7 @@
         <div class="main_body">
           <div class="mb-3">
             <label for="exampleFormControlTextarea1" class="form-label"
-              >Execute your costume query here :</label
+              >Execute your costum query here :</label
             >
             <button
               style="position: absolute; right: 6vh"
@@ -55,6 +54,31 @@
                 src="/icons/play.svg"
               />
             </button>
+            <select
+              style="position: absolute; right: 55vh; width: 23vh; top: 5.1vh"
+              class="form-select form-select-sm"
+              aria-label="Default select example"
+              id="querySelect"
+            >
+              <option selected>Load saved Query</option>
+            </select>
+            <button
+              style="position: absolute; right: 16vh"
+              type="button"
+              class="btn btn-success btn-sm"
+              id="saveQuery"
+            >
+              Save query
+            </button>
+            <input
+              style="position: absolute; right: 30vh; width: 23vh; top: 5.1vh"
+              type="text"
+              class="form-control form-control-sm"
+              id="query_name"
+              placeholder="name your query"
+              aria-describedby="emailHelp"
+            />
+
             <textarea
               style="margin-top: 2vh"
               class="form-control"
