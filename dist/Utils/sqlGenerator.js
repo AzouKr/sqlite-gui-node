@@ -78,6 +78,9 @@ function generateCreateTableSQL(tableName, data) {
             case "REAL":
                 columnType = "REAL";
                 break;
+            case "DATE":
+                columnType = "DATETIME DEFAULT CURRENT_TIMESTAMP";
+                break;
             default:
                 throw new Error(`Unknown type: ${item.type}`);
         }

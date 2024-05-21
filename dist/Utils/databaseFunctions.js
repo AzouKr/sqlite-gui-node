@@ -132,7 +132,8 @@ function fetchTableInfo(db, table) {
             }
             else {
                 // Filter out the auto-increment column
-                const filteredColumns = rows.filter((row) => !(row.pk > 0 && row.type.toUpperCase() === "INTEGER"));
+                const filteredColumns = rows.filter((row) => !((row.pk > 0 && row.type.toUpperCase() === "INTEGER") ||
+                    row.type.toUpperCase() === "DATETIME"));
                 // Map the remaining columns to an array of column objects with name and type
                 const tableInfo = filteredColumns.map((row) => ({
                     field: row.name,
@@ -147,21 +148,6 @@ function fetchTableInfo(db, table) {
                 else {
                     resolve({ bool: true, data: tableInfo });
                 }
-            }
-        });
-    });
-}
-function insertTable(db, sqlStatement) {
-    return new Promise((resolve, reject) => {
-        db.run(sqlStatement, function (error) {
-            if (error) {
-                logger_1.default.error("SQL Statement : " + sqlStatement);
-                logger_1.default.error(error.message);
-                reject({ bool: false, error: error.message });
-                return;
-            }
-            else {
-                resolve({ bool: true });
             }
         });
     });
@@ -254,7 +240,6 @@ exports.default = {
     checkColumnHasDefault,
     fetchAllTables,
     fetchTable,
-    insertTable,
     fetchTableInfo,
     deleteFromTable,
     fetchRecord,

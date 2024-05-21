@@ -166,7 +166,11 @@ function fetchTableInfo(
       } else {
         // Filter out the auto-increment column
         const filteredColumns = rows.filter(
-          (row: any) => !(row.pk > 0 && row.type.toUpperCase() === "INTEGER")
+          (row: any) =>
+            !(
+              (row.pk > 0 && row.type.toUpperCase() === "INTEGER") ||
+              row.type.toUpperCase() === "DATETIME"
+            )
         );
 
         // Map the remaining columns to an array of column objects with name and type
@@ -183,24 +187,6 @@ function fetchTableInfo(
         } else {
           resolve({ bool: true, data: tableInfo });
         }
-      }
-    });
-  });
-}
-
-function insertTable(
-  db: sqlite3.Database,
-  sqlStatement: string
-): Promise<{ bool: boolean; error?: string }> {
-  return new Promise((resolve, reject) => {
-    db.run(sqlStatement, function (error) {
-      if (error) {
-        logger.error("SQL Statement : " + sqlStatement);
-        logger.error(error.message);
-        reject({ bool: false, error: error.message });
-        return;
-      } else {
-        resolve({ bool: true });
       }
     });
   });
@@ -314,7 +300,6 @@ export default {
   checkColumnHasDefault,
   fetchAllTables,
   fetchTable,
-  insertTable,
   fetchTableInfo,
   deleteFromTable,
   fetchRecord,

@@ -1,7 +1,32 @@
+let pk_count = 1;
 async function createForm() {
   const insertButton = document.getElementById("insert_btn");
   const createButton = document.getElementById("create_table_btn");
   const queryButton = document.getElementById("query_table_btn");
+  const default_div = document.getElementById("default-input-div");
+
+  const selectElement = document.getElementById("input-pk");
+  selectElement.addEventListener("change", (event) => {
+    if (event.target.value === "PRIMARY KEY AUTOINCREMENT") {
+      default_div.style.display = "none";
+    } else {
+      default_div.style.display = "block";
+    }
+  });
+  const selectElement2 = document.getElementById("input-type");
+  const selectElement3 = document.getElementById("pk-input-div");
+  const date_alert = document.getElementById("date_alert");
+  selectElement2.addEventListener("change", (event) => {
+    if (event.target.value === "DATE") {
+      default_div.style.display = "none";
+      selectElement3.style.display = "none";
+      date_alert.style.display = "block";
+    } else {
+      default_div.style.display = "block";
+      selectElement3.style.display = "block";
+      date_alert.style.display = "none";
+    }
+  });
 
   insertButton.onclick = () => {
     const fieldNameInput = document.getElementById("input_form_name");
@@ -17,6 +42,14 @@ async function createForm() {
     if (!fieldName) {
       alert("Please enter the name of the field");
       return;
+    }
+    if (inputPk === "PRIMARY KEY AUTOINCREMENT") {
+      if (pk_count === 2) {
+        alert("A table must have a maximum one primary key");
+        return;
+      } else {
+        pk_count++;
+      }
     }
 
     const newRow = document.createElement("tr");
@@ -47,6 +80,8 @@ async function createForm() {
     // Reset the select inputs to their initial state
     document.getElementById("input-type").selectedIndex = 0;
     document.getElementById("input-pk").selectedIndex = 0;
+    default_div.style.display = "block";
+    selectElement3.style.display = "block";
   };
 
   createButton.onclick = () => {
@@ -110,7 +145,6 @@ async function createForm() {
     );
     const tableNameInput = document.getElementById("table-name");
     const tableName = tableNameInput.value;
-
     if (rows.length < 2) {
       alert("Please create at least 2 columns for the table");
       return;
@@ -123,6 +157,7 @@ async function createForm() {
 
     const data = Array.from(rows).map((row) => {
       const cells = row.querySelectorAll("td");
+
       let defaultValue = cells[3].innerText;
 
       // Check if default value is a number (integer or real)
@@ -141,7 +176,7 @@ async function createForm() {
     });
 
     try {
-      const response = await fetch("/api/tables/generate/create", {
+      await fetch("/api/tables/generate/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

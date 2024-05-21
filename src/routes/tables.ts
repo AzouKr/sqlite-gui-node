@@ -68,7 +68,7 @@ function tableRoutes(db: sqlite3.Database) {
         tablename,
         dataArray
       );
-      const response = await databaseFunctions.insertTable(db, sql);
+      const response = await databaseFunctions.runQuery(db, sql);
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -135,7 +135,7 @@ function tableRoutes(db: sqlite3.Database) {
     try {
       const { tableName, data } = req.body;
       const sql = sqlGenerator.generateCreateTableSQL(tableName, data);
-      const response = await databaseFunctions.insertTable(db, sql);
+      const response = await databaseFunctions.runQuery(db, sql);
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -156,7 +156,7 @@ function tableRoutes(db: sqlite3.Database) {
     try {
       const { tablename, dataArray, userId } = req.body;
       const sql = sqlGenerator.generateUpdateSQL(tablename, dataArray, userId);
-      const response = await databaseFunctions.insertTable(db, sql);
+      const response = await databaseFunctions.runQuery(db, sql);
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -208,7 +208,7 @@ function tableRoutes(db: sqlite3.Database) {
     try {
       const { tablename } = req.body;
       const sql = `DROP TABLE ${tablename};`;
-      const response = await databaseFunctions.insertTable(db, sql);
+      const response = await databaseFunctions.runQuery(db, sql);
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });

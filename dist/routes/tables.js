@@ -71,7 +71,7 @@ function tableRoutes(db) {
         try {
             const { tablename, dataArray } = req.body;
             const sql = yield sqlGenerator_1.default.generateInsertSQL(db, tablename, dataArray);
-            const response = yield databaseFunctions_1.default.insertTable(db, sql);
+            const response = yield databaseFunctions_1.default.runQuery(db, sql);
             res.status(200).json(response);
         }
         catch (error) {
@@ -134,7 +134,7 @@ function tableRoutes(db) {
         try {
             const { tableName, data } = req.body;
             const sql = sqlGenerator_1.default.generateCreateTableSQL(tableName, data);
-            const response = yield databaseFunctions_1.default.insertTable(db, sql);
+            const response = yield databaseFunctions_1.default.runQuery(db, sql);
             res.status(200).json(response);
         }
         catch (error) {
@@ -155,7 +155,7 @@ function tableRoutes(db) {
         try {
             const { tablename, dataArray, userId } = req.body;
             const sql = sqlGenerator_1.default.generateUpdateSQL(tablename, dataArray, userId);
-            const response = yield databaseFunctions_1.default.insertTable(db, sql);
+            const response = yield databaseFunctions_1.default.runQuery(db, sql);
             res.status(200).json(response);
         }
         catch (error) {
@@ -196,7 +196,7 @@ function tableRoutes(db) {
         try {
             const { tablename } = req.body;
             const sql = `DROP TABLE ${tablename};`;
-            const response = yield databaseFunctions_1.default.insertTable(db, sql);
+            const response = yield databaseFunctions_1.default.runQuery(db, sql);
             res.status(200).json(response);
         }
         catch (error) {
