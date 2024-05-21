@@ -7,7 +7,6 @@ const {
   fetchTableInfo,
   deleteFromTable,
   fetchRecord,
-  checkColumnHasDefault,
   runQuery,
   runSelectQuery,
   fetchQueries,
@@ -32,7 +31,7 @@ module.exports = function (db) {
   });
   router.get("/local/query", async (req, res) => {
     try {
-      fetchQueries().then((tables) => {
+      fetchQueries(db).then((tables) => {
         res.status(200).json(tables); // Changed variable name to avoid conflict
       });
     } catch (error) {
@@ -44,7 +43,7 @@ module.exports = function (db) {
     try {
       // // Extract table name and data
       const { name, sqlStatement } = req.body;
-      insertQuery(name, sqlStatement)
+      insertQuery(db, name, sqlStatement)
         .then((response) => {
           res.status(200).json(response); // Changed variable name to avoid conflict
         })

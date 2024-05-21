@@ -34,7 +34,7 @@ const logger = require("./src/Utils/logger");
 const { InitializeDB } = require("./src/Utils/displayTables");
 
 async function SqliteGuiNode(db, port = 8080) {
-  InitializeDB();
+  InitializeDB(db);
   app.use("/api/tables", tableRoutes(db));
   app.listen(port, () => {
     logger.info(`SQLite Web Admin Tool running at http://localhost:${port}`);

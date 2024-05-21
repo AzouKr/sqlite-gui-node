@@ -1,6 +1,6 @@
 {
   "name": "sqlite-gui-node",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "GUI for Node js SQLite databases",
   "main": "index.js",
   "scripts": {

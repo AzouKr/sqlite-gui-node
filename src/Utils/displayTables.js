@@ -1,11 +1,8 @@
-const sqlite3 = require("sqlite3").verbose();
-const local = new sqlite3.Database("./src/local.db");
-
 const logger = require("./logger");
 
-function InitializeDB() {
-  local.serialize(() => {
-    local.get(
+function InitializeDB(db) {
+  db.serialize(() => {
+    db.get(
       "SELECT name FROM sqlite_master WHERE type='table' AND name='query'",
       (err, row) => {
         if (err) {
@@ -15,7 +12,7 @@ function InitializeDB() {
         }
 
         if (!row) {
-          local.run(
+          db.run(
             `
             CREATE TABLE IF NOT EXISTS query (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,9 +34,9 @@ function InitializeDB() {
   });
 }
 
-function insertQuery(name, sqlStatement) {
+function insertQuery(db, name, sqlStatement) {
   return new Promise(function (resolve, reject) {
-    local.run(
+    db.run(
       `INSERT INTO query (name, sqlstatement) VALUES (? , ?)`,
       [name, sqlStatement],
       function (error) {
@@ -57,9 +54,9 @@ function insertQuery(name, sqlStatement) {
   });
 }
 
-function fetchQueries() {
+function fetchQueries(db) {
   return new Promise(function (resolve, reject) {
-    local.all(`SELECT * FROM query`, function (error, rows) {
+    db.all(`SELECT * FROM query`, function (error, rows) {
       if (error) {
         logger.error("Error while fetching table");
         logger.error(error.message);
