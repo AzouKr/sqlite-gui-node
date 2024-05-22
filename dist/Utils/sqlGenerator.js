@@ -20,7 +20,23 @@ function generateInsertSQL(db, tableName, data) {
         const values = [];
         yield Promise.all(data.map((item) => __awaiter(this, void 0, void 0, function* () {
             const hasDefault = yield databaseFunctions_1.default.checkColumnHasDefault(db, tableName, item.type.toUpperCase(), item.field);
-            if (!hasDefault.bool) {
+            if (item.value === "") {
+                if (!hasDefault.bool) {
+                    // doesn't have default value
+                    columns.push(item.field);
+                    if (item.type.toUpperCase() === "TEXT" ||
+                        item.type.toUpperCase() === "BLOB") {
+                        values.push(item.value !== ""
+                            ? `'${String(item.value).replace(/'/g, "''")}'`
+                            : "NULL" // Escape single quotes or use NULL
+                        );
+                    }
+                    else {
+                        values.push(String(item.value) !== "" ? String(item.value) : "NULL"); // Include NULL for empty values
+                    }
+                }
+            }
+            else {
                 // doesn't have default value
                 columns.push(item.field);
                 if (item.type.toUpperCase() === "TEXT" ||

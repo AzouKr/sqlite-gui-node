@@ -11,6 +11,7 @@
 - [Installation](#installation)
 - [Using a Custom Port](#using-a-custom-port)
 - [Arguments](#arguments)
+- [Features](#features)
 - [Updating the Package](#updating-the-package)
 - [Uninstallation](#uninstallation)
 - [Screenshots](#screenshots)
