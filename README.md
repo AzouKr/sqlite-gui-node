@@ -30,27 +30,24 @@ $ npm install sqlite-gui-node
 
 ### Step 2: Import and Initialize
 
-After installing the package, you can import it in your index file of your project.
+After installing the package, you can import it in your index file of your project server.
 
 ```js
+const express = require("express");
 // import the SQLite DB that you use
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("app.db");
 // Import the package
-const SqliteGuiNode = require('sqlite-gui-node');
+const SqliteGuiNode = require("sqlite-gui-node");
 
-...
+const app = express();
 
 // use the GUI
 SqliteGuiNode(db).catch((err) => {
-  console.error("Error starting the server:", err);
+  console.error("Error starting the GUI:", err);
 });
 
-// Start the server and listen on the specified port
-server.listen(port, () => {
-  logger.info(`Server is running on ${port}`);
-});
-
+app.listen(4000);
 ```
 
 ### Step 3: Access the GUI
