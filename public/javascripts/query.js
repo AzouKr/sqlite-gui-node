@@ -24,7 +24,6 @@ async function createForm() {
     selectElement.appendChild(option);
   });
   selectElement.addEventListener("change", (event) => {
-    console.log(event.target.value);
     const selectedValue = event.target.value;
     const textarea = document.getElementById("queryTextarea");
     textarea.textContent = selectedValue;
@@ -56,7 +55,7 @@ async function createForm() {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      console.log(response);
+      alert("Query saved !!");
     } catch (error) {
       console.error(error);
     }
@@ -110,7 +109,6 @@ async function createForm() {
                 td.textContent = row[header];
                 tr.appendChild(td);
               });
-              console.log(tr);
 
               tableBody.appendChild(tr);
             });

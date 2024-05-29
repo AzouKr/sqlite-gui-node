@@ -1,11 +1,15 @@
 let tablename;
 let userId;
+let id_label;
 
 document.addEventListener("DOMContentLoaded", async () => {
   const pathParts = window.location.pathname.split("/");
   tablename = pathParts[2];
-  userId = pathParts[3];
-  const response = await fetch(`/api/tables/getrecord/${tablename}/${userId}`); // Correct endpoint
+  id_label = pathParts[3];
+  userId = pathParts[4];
+  const response = await fetch(
+    `/api/tables/getrecord/${tablename}/${id_label}/${userId}`
+  ); // Correct endpoint
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -63,25 +67,53 @@ function displayTableData(fields, dataObject) {
     const label = document.createElement("label");
     label.classList.add("form-label");
     label.textContent = field.field;
+    label.setAttribute("for", `input-${field.field}`);
     mainBodyDiv.appendChild(label);
 
     const br = document.createElement("br");
     mainBodyDiv.appendChild(br);
 
-    const input = document.createElement("input");
-    input.type = getInputType(field.type);
-    input.classList.add("form-control");
-    input.id = `input-${field.field}`; // Set a unique ID for each input
-    input.dataset.field = field.field; // Store the field name
-    input.dataset.type = field.type; // Store the field type
-
-    // Set placeholder and value with the corresponding value from dataObject
-    if (dataObject && dataObject.hasOwnProperty(field.field)) {
-      input.placeholder = dataObject[field.field];
-      input.value = dataObject[field.field];
+    if (field.fk === undefined) {
+      const input = document.createElement("input");
+      input.classList.add("form-control");
+      input.classList.add("input_value");
+      input.setAttribute("id", field.field);
+      input.dataset.fieldType = field.type; // Store field type in dataset
+      input.dataset.field = field.field;
+      input.type = getInputType(field.type);
+      input.placeholder = field.field;
+      // Set placeholder and value with the corresponding value from dataObject
+      if (dataObject && dataObject.hasOwnProperty(field.field)) {
+        input.value = dataObject[field.field];
+      }
+      mainBodyDiv.appendChild(input);
+    } else {
+      // Create the select element
+      const select = document.createElement("select");
+      select.className = "form-select";
+      select.classList.add("input_value");
+      select.dataset.fieldType = field.type; // Store field type in dataset
+      select.dataset.field = field.field;
+      select.setAttribute("id", field.field);
+      select.placeholder = field.field;
+      select.setAttribute("aria-label", "Default select example");
+      // // Create and append the default option
+      const defaultOption = document.createElement("option");
+      defaultOption.selected = true;
+      defaultOption.textContent = "Open this select menu";
+      select.appendChild(defaultOption);
+      // // Create and append the other options
+      field.fk.forEach((num) => {
+        const option = document.createElement("option");
+        option.value = num;
+        option.textContent = num; // or use any other text you need, like converting numbers to words
+        select.appendChild(option);
+      });
+      if (dataObject && dataObject.hasOwnProperty(field.field)) {
+        select.value = dataObject[field.field];
+      }
+      mainBodyDiv.appendChild(select);
     }
-
-    mainBodyDiv.appendChild(input);
 
     const br2 = document.createElement("br");
     mainBodyDiv.appendChild(br2);
@@ -92,10 +124,10 @@ function displayTableData(fields, dataObject) {
   editButton.textContent = "Edit row";
   editButton.classList.add("insert_btn"); // Apply the class for styling
   editButton.addEventListener("click", () => {
-    const inputs = document.querySelectorAll(".form-control");
+    const inputs = document.querySelectorAll(".input_value");
     const dataArray = Array.from(inputs).map((input) => {
       let value = input.value;
-      const type = input.dataset.type;
+      const type = input.dataset.fieldType;
 
       // Use the value from dataObject if the input is not changed
       if (!value) {
@@ -108,7 +140,6 @@ function displayTableData(fields, dataObject) {
       } else {
         formattedValue = value;
       }
-
       return {
         field: input.dataset.field,
         value: formattedValue,
@@ -122,7 +153,7 @@ function displayTableData(fields, dataObject) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ tablename, dataArray, userId }),
+      body: JSON.stringify({ tablename, dataArray, userId, id_label }),
     })
       .then((response) => {
         if (!response.ok) {
@@ -141,8 +172,14 @@ function displayTableData(fields, dataObject) {
   getQueryButton.textContent = "Get query";
   getQueryButton.classList.add("insert_btn");
   getQueryButton.addEventListener("click", async () => {
-    const inputs = document.querySelectorAll(".form-control");
+    const inputs = document.querySelectorAll(".input_value");
+    let id_name;
+    let count = 0;
     const dataArray = Array.from(inputs).map((input) => {
+      if (count === 0) {
+        id_name = input.placeholder;
+        count++;
+      }
       const value = input.value;
       const type = input.dataset.fieldType; // Retrieve field type from dataset
       return {
@@ -158,7 +195,7 @@ function displayTableData(fields, dataObject) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ tablename, dataArray, userId }),
+        body: JSON.stringify({ tablename, dataArray, userId, id_label }),
       })
         .then((response) => response.json())
         .then((data) => {

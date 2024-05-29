@@ -79,22 +79,24 @@ function displayTableData(data) {
   deleteButton.textContent = "Delete table";
   deleteButton.classList.add("delete_btn");
   deleteButton.onclick = () => {
-    fetch("/api/tables/table/delete", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ tablename }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        location.reload();
+    if (window.confirm("Are you sure you want to delete this table")) {
+      fetch("/api/tables/table/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tablename }),
       })
-      .catch((error) => {
-        console.error("Error deleting table:", error);
-      });
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          location.reload();
+        })
+        .catch((error) => {
+          console.error("Error deleting table:", error);
+        });
+    }
   };
   headerDiv.appendChild(deleteButton);
   mainBodyDiv.appendChild(headerDiv);
@@ -118,7 +120,13 @@ function displayTableData(data) {
 
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
+    let count = 0;
+    let id_name;
     Object.keys(data[0]).forEach((key) => {
+      if (count === 0) {
+        id_name = key;
+      }
+      count++;
       const th = document.createElement("th");
       th.scope = "col";
       th.textContent = key;
@@ -179,7 +187,7 @@ function displayTableData(data) {
       editIcon.classList.add("action-icon");
       editIcon.style.height = "2vh";
       editIcon.onclick = () => {
-        window.location.href = `/edit/${tablename}/${row.id}`;
+        window.location.href = `/edit/${tablename}/${id_name}/${row[id_name]}`;
       };
       editTd.appendChild(editIcon);
       fixedTr.appendChild(editTd);
@@ -190,27 +198,29 @@ function displayTableData(data) {
       deleteIcon.classList.add("action-icon");
       deleteIcon.style.height = "2vh";
       deleteIcon.onclick = () => {
-        fetch("/api/tables/delete", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            tablename,
-            id: row.id,
-          }),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok");
-            }
-            const tr = document.getElementById(row.id);
-            tr.remove();
-            fixedTr.remove();
+        if (window.confirm("Are you sure you want to delete this row")) {
+          fetch("/api/tables/delete", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              tablename,
+              id: row.id,
+            }),
           })
-          .catch((error) => {
-            console.error("Error deleting data:", error);
-          });
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              const tr = document.getElementById(row.id);
+              tr.remove();
+              fixedTr.remove();
+            })
+            .catch((error) => {
+              console.error("Error deleting data:", error);
+            });
+        }
       };
       deleteTd.appendChild(deleteIcon);
       fixedTr.appendChild(deleteTd);

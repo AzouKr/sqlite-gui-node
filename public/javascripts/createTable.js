@@ -1,16 +1,102 @@
 let pk_count = 1;
+
+async function fetchData() {
+  try {
+    const response = await fetch("/api/tables");
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    const select = document.getElementById("input-table");
+    // // Create and append the default option
+    const defaultOption = document.createElement("option");
+    defaultOption.selected = true;
+    defaultOption.textContent = "Open this select menu";
+    defaultOption.value = "";
+    select.appendChild(defaultOption);
+    // // Create and append the other options
+    data.data.forEach((table) => {
+      if (table.name !== "sqlite_sequence" && table.name !== "query") {
+        const option = document.createElement("option");
+        option.value = table.name;
+        option.textContent = table.name; // or use any other text you need, like converting numbers to words
+        select.appendChild(option);
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+async function fetchTableInfos(tableName) {
+  try {
+    const response = await fetch(`/api/tables/all/infos/${tableName}`); // Correct endpoint
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    if (data.bool) {
+      const select = document.getElementById("column-table");
+      // // Create and append the default option
+      const defaultOption = document.createElement("option");
+      defaultOption.selected = true;
+      defaultOption.textContent = "Open this select menu";
+      defaultOption.value = "";
+      select.appendChild(defaultOption);
+      // // Create and append the other options
+      data.data.forEach((table) => {
+        const option = document.createElement("option");
+        option.value = table.field;
+        option.textContent = table.field; // or use any other text you need, like converting numbers to words
+        select.appendChild(option);
+      });
+    } else {
+      console.error("Error fetching table data:", data.error);
+    }
+  } catch (error) {
+    console.error("Error fetching table data:", error);
+  }
+}
+
 async function createForm() {
+  fetchData();
   const insertButton = document.getElementById("insert_btn");
   const createButton = document.getElementById("create_table_btn");
   const queryButton = document.getElementById("query_table_btn");
   const default_div = document.getElementById("default-input-div");
+  const table_div = document.getElementById("table-input-div");
+  const columns_div = document.getElementById("Columns");
+  const fk_div = document.getElementById("fk-input-div");
 
   const selectElement = document.getElementById("input-pk");
   selectElement.addEventListener("change", (event) => {
     if (event.target.value === "PRIMARY KEY AUTOINCREMENT") {
       default_div.style.display = "none";
+      fk_div.style.display = "none";
     } else {
       default_div.style.display = "block";
+      fk_div.style.display = "block";
+    }
+  });
+
+  const fkElement = document.getElementById("input-fk");
+  fkElement.addEventListener("change", (event) => {
+    if (event.target.value === "yes") {
+      default_div.style.display = "none";
+      table_div.style.display = "block";
+    } else {
+      default_div.style.display = "block";
+      table_div.style.display = "none";
+    }
+  });
+
+  const tableElement = document.getElementById("input-table");
+  tableElement.addEventListener("change", (event) => {
+    if (event.target.value !== "") {
+      fetchTableInfos(event.target.value);
+      columns_div.style.display = "block";
+    } else {
+      columns_div.style.display = "none";
     }
   });
   const selectElement2 = document.getElementById("input-type");
@@ -33,6 +119,9 @@ async function createForm() {
     const fieldName = fieldNameInput.value;
     const inputType = document.getElementById("input-type").value;
     const inputPk = document.getElementById("input-pk").value;
+    const inputFK = document.getElementById("input-fk").value;
+    const inputTable = document.getElementById("input-table").value;
+    const columnTable = document.getElementById("column-table").value;
     const defaultValueInput = document.getElementById("default-input");
     const defaultValue = defaultValueInput.value || "None";
     const tableDataTbody = document.querySelector(
@@ -52,6 +141,17 @@ async function createForm() {
       }
     }
 
+    if (inputFK === "yes") {
+      if (inputTable === "") {
+        alert("Make sur you select table of the foreign key");
+        return;
+      }
+      if (columnTable === "") {
+        alert("Make sur you select column of the foreign key");
+        return;
+      }
+    }
+
     const newRow = document.createElement("tr");
 
     const nameCell = document.createElement("td");
@@ -66,10 +166,17 @@ async function createForm() {
     const defaultCell = document.createElement("td");
     defaultCell.innerText = defaultValue;
 
+    const fkCell = document.createElement("td");
+    fkCell.innerText =
+      inputTable === ""
+        ? "No"
+        : `FOREIGN KEY(${fieldName}) REFERENCES ${inputTable}(${columnTable})`;
+
     newRow.appendChild(nameCell);
     newRow.appendChild(typeCell);
     newRow.appendChild(pkCell);
     newRow.appendChild(defaultCell);
+    newRow.appendChild(fkCell);
 
     tableDataTbody.appendChild(newRow);
 
@@ -80,8 +187,14 @@ async function createForm() {
     // Reset the select inputs to their initial state
     document.getElementById("input-type").selectedIndex = 0;
     document.getElementById("input-pk").selectedIndex = 0;
+    document.getElementById("input-fk").selectedIndex = 0;
+    document.getElementById("input-table").selectedIndex = 0;
+    document.getElementById("column-table").selectedIndex = 0;
     default_div.style.display = "block";
+    table_div.style.display = "none";
+    columns_div.style.display = "none";
     selectElement3.style.display = "block";
+    fk_div.style.display = "block";
   };
 
   createButton.onclick = () => {
@@ -111,11 +224,11 @@ async function createForm() {
       } else if (defaultValue === "None") {
         defaultValue = null;
       }
-
       return {
         name: cells[0].innerText,
         type: cells[1].innerText,
         pk: cells[2].innerText === "YES" ? "PRIMARY KEY AUTOINCREMENT" : "",
+        fk: cells[4].innerText,
         default: defaultValue,
       };
     });
@@ -157,7 +270,6 @@ async function createForm() {
 
     const data = Array.from(rows).map((row) => {
       const cells = row.querySelectorAll("td");
-
       let defaultValue = cells[3].innerText;
 
       // Check if default value is a number (integer or real)
@@ -171,6 +283,7 @@ async function createForm() {
         name: cells[0].innerText,
         type: cells[1].innerText,
         pk: cells[2].innerText === "YES" ? "PRIMARY KEY AUTOINCREMENT" : "",
+        fk: cells[4].innerText,
         default: defaultValue,
       };
     });

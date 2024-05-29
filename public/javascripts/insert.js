@@ -56,17 +56,44 @@ function displayTableData(fields) {
     const label = document.createElement("label");
     label.classList.add("form-label");
     label.textContent = field.field;
+    label.setAttribute("for", field.field);
     mainBodyDiv.appendChild(label);
 
     const br = document.createElement("br");
     mainBodyDiv.appendChild(br);
 
-    const input = document.createElement("input");
-    input.classList.add("form-control");
-    input.dataset.fieldType = field.type; // Store field type in dataset
-    input.placeholder = field.field;
-    mainBodyDiv.appendChild(input);
-
+    if (field.fk === undefined) {
+      const input = document.createElement("input");
+      input.classList.add("form-control");
+      input.classList.add("input_value");
+      input.setAttribute("id", field.field);
+      input.dataset.fieldType = field.type; // Store field type in dataset
+      input.type = getInputType(field.type);
+      input.placeholder = field.field;
+      mainBodyDiv.appendChild(input);
+    } else {
+      // Create the select element
+      const select = document.createElement("select");
+      select.className = "form-select";
+      select.classList.add("input_value");
+      select.dataset.fieldType = field.type; // Store field type in dataset
+      select.setAttribute("id", field.field);
+      select.placeholder = field.field;
+      select.setAttribute("aria-label", "Default select example");
+      // // Create and append the default option
+      const defaultOption = document.createElement("option");
+      defaultOption.selected = true;
+      defaultOption.textContent = "Open this select menu";
+      select.appendChild(defaultOption);
+      // // Create and append the other options
+      field.fk.forEach((num) => {
+        const option = document.createElement("option");
+        option.value = num;
+        option.textContent = num; // or use any other text you need, like converting numbers to words
+        select.appendChild(option);
+      });
+      mainBodyDiv.appendChild(select);
+    }
     const br2 = document.createElement("br");
     mainBodyDiv.appendChild(br2);
   });
@@ -75,7 +102,7 @@ function displayTableData(fields) {
   insertButton.textContent = "Insert";
   insertButton.classList.add("insert_btn");
   insertButton.addEventListener("click", async () => {
-    const inputs = document.querySelectorAll(".form-control");
+    const inputs = document.querySelectorAll(".input_value");
     const dataArray = Array.from(inputs).map((input) => {
       const value = input.value;
       const type = input.dataset.fieldType; // Retrieve field type from dataset
@@ -115,7 +142,7 @@ function displayTableData(fields) {
   getQueryButton.textContent = "Get query";
   getQueryButton.classList.add("insert_btn");
   getQueryButton.addEventListener("click", async () => {
-    const inputs = document.querySelectorAll(".form-control");
+    const inputs = document.querySelectorAll(".input_value");
     const dataArray = Array.from(inputs).map((input) => {
       const value = input.value;
       const type = input.dataset.fieldType; // Retrieve field type from dataset
