@@ -122,7 +122,7 @@
 .table td {
   border: 1px solid #ccc;
   padding: 8px;
-  text-align: center;
+  text-align: left;
 }
 
 .main_body_header {
