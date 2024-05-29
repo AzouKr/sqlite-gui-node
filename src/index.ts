@@ -33,7 +33,7 @@ app.get("/insert/:table", (req, res) => {
   res.render("insert", { tableName });
 });
 
-app.get("/edit/:table/:id", (req, res) => {
+app.get("/edit/:table/:label/:id", (req, res) => {
   const tableName = req.params.table;
   const id = req.params.id;
   res.render("edit", { tableName, id });

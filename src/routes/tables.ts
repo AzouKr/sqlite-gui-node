@@ -54,6 +54,34 @@ function tableRoutes(db: sqlite3.Database) {
     const { name } = req.params;
     try {
       const response = await databaseFunctions.fetchTableInfo(db, name);
+      const fk = await databaseFunctions.fetchTableForeignKeys(db, name);
+      if (fk.bool && fk.data !== undefined) {
+        fk.data.forEach((element) => {
+          databaseFunctions
+            .fetchFK(db, element.table, element.to)
+            .then((fk_response) => {
+              if (response.data !== undefined) {
+                response.data.forEach((item) => {
+                  if (item.field === element.from) {
+                    item.fk = fk_response.data.map((obj) => obj[element.to]);
+                  }
+                });
+              }
+              res.status(200).json(response);
+            });
+        });
+      } else {
+        res.status(200).json(response);
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  router.get("/all/infos/:name", async (req: Request, res: Response) => {
+    const { name } = req.params;
+    try {
+      const response = await databaseFunctions.fetchAllTableInfo(db, name);
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -154,8 +182,13 @@ function tableRoutes(db: sqlite3.Database) {
 
   router.post("/update", async (req: Request, res: Response) => {
     try {
-      const { tablename, dataArray, userId } = req.body;
-      const sql = sqlGenerator.generateUpdateSQL(tablename, dataArray, userId);
+      const { tablename, dataArray, userId, id_label } = req.body;
+      const sql = sqlGenerator.generateUpdateSQL(
+        tablename,
+        dataArray,
+        userId,
+        id_label
+      );
       const response = await databaseFunctions.runQuery(db, sql);
       res.status(200).json(response);
     } catch (error) {
@@ -165,8 +198,13 @@ function tableRoutes(db: sqlite3.Database) {
 
   router.post("/generate/update", async (req: Request, res: Response) => {
     try {
-      const { tablename, dataArray, userId } = req.body;
-      const sql = sqlGenerator.generateUpdateSQL(tablename, dataArray, userId);
+      const { tablename, dataArray, userId, id_label } = req.body;
+      const sql = sqlGenerator.generateUpdateSQL(
+        tablename,
+        dataArray,
+        userId,
+        id_label
+      );
       res.status(200).json(sql);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -174,13 +212,14 @@ function tableRoutes(db: sqlite3.Database) {
   });
 
   router.get(
-    "/getrecord/:tablename/:id",
+    "/getrecord/:tablename/:label/:id",
     async (req: Request, res: Response) => {
       try {
-        const { tablename, id } = req.params;
+        const { tablename, label, id } = req.params;
         const response = await databaseFunctions.fetchRecord(
           db,
           tablename,
+          label,
           Number(id)
         );
         res.status(200).json(response);

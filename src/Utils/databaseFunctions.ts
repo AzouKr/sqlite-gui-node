@@ -13,6 +13,21 @@ interface Query {
 interface ColumnInfo {
   field: string;
   type: string;
+  fk?: any[];
+}
+
+// Define the type for the foreign key information
+interface ForeignKeyInfo {
+  table: string;
+  from: string;
+  to: string;
+}
+
+// Define the return type for the fetchTableForeignKeys function
+interface FetchTableForeignKeysResult {
+  bool: boolean;
+  data?: ForeignKeyInfo[];
+  error?: string;
 }
 
 async function InitializeDB(db: sqlite3.Database): Promise<void> {
@@ -134,11 +149,12 @@ function fetchTable(
 function fetchRecord(
   db: sqlite3.Database,
   table: string,
+  label: string,
   id: number
 ): Promise<{ bool: boolean; data?: any[] }> {
   return new Promise((resolve, reject) => {
     db.all(
-      `SELECT * FROM ${table} WHERE id = ${id}`,
+      `SELECT * FROM ${table} WHERE ${label} = ${id}`,
       function (error, rows: any) {
         if (error) {
           logger.error("Error while fetching record");
@@ -187,6 +203,83 @@ function fetchTableInfo(
         } else {
           resolve({ bool: true, data: tableInfo });
         }
+      }
+    });
+  });
+}
+
+function fetchAllTableInfo(
+  db: sqlite3.Database,
+  table: string
+): Promise<{ bool: boolean; data?: ColumnInfo[] }> {
+  return new Promise((resolve, reject) => {
+    db.all(`PRAGMA table_info(${table})`, function (error, rows: any) {
+      if (error) {
+        logger.error("Error while fetching table info");
+        logger.error(error.message);
+        reject({ bool: false, error: error.message });
+      } else {
+        // Map the columns to an array of column objects with name and type
+        const tableInfo = rows.map((row: any) => ({
+          field: row.name,
+          type: row.type,
+        }));
+
+        if (tableInfo.length === 0) {
+          reject({
+            bool: false,
+            error: "No columns to select (all columns are auto-increment).",
+          });
+        } else {
+          resolve({ bool: true, data: tableInfo });
+        }
+      }
+    });
+  });
+}
+
+// Function to fetch foreign key info of a table
+async function fetchTableForeignKeys(
+  db: sqlite3.Database,
+  table: string
+): Promise<FetchTableForeignKeysResult> {
+  return new Promise((resolve, reject) => {
+    db.all(`PRAGMA foreign_key_list(${table})`, function (error, rows: any) {
+      if (error) {
+        console.error("Error while fetching foreign key info");
+        console.error(error.message);
+        reject({ bool: false, error: error.message });
+      } else {
+        if (rows.length === 0) {
+          resolve({ bool: false, data: [] });
+        } else {
+          const foreignKeys = rows.map((row: any) => ({
+            table: row.table,
+            from: row.from,
+            to: row.to,
+          }));
+
+          resolve({ bool: true, data: foreignKeys });
+        }
+      }
+    });
+  });
+}
+
+function fetchFK(
+  db: sqlite3.Database,
+  table: string,
+  column: string
+): Promise<{ bool: boolean; data: any[] }> {
+  return new Promise((resolve, reject) => {
+    db.all(`SELECT ${column} from ${table}`, function (error, rows) {
+      if (error) {
+        logger.error("Error while fetching Foreign keys");
+        logger.error(error.message);
+        reject({ bool: false, data: [], error: error.message });
+        return;
+      } else {
+        resolve({ bool: true, data: rows });
       }
     });
   });
@@ -301,6 +394,7 @@ export default {
   fetchAllTables,
   fetchTable,
   fetchTableInfo,
+  fetchAllTableInfo,
   deleteFromTable,
   fetchRecord,
   runQuery,
@@ -308,4 +402,6 @@ export default {
   InitializeDB,
   insertQuery,
   fetchQueries,
+  fetchTableForeignKeys,
+  fetchFK,
 };

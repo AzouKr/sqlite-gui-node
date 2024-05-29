@@ -6,6 +6,7 @@ interface DataItem {
   type: string;
   value?: string | number | null; // Optional value based on type
   pk?: string; // Optional primary key constraint
+  fk: string;
   default?: string | number | null; // Optional default value
 }
 
@@ -74,7 +75,8 @@ async function generateInsertSQL(
 function generateUpdateSQL(
   tableName: string,
   data: DataItem[],
-  id: number
+  id: number,
+  id_label: string
 ): string {
   // Extract field names and values with proper handling
   const setClauses = data
@@ -96,16 +98,20 @@ function generateUpdateSQL(
     .join(", ");
 
   // Form the SQL statement
-  const sql = `UPDATE ${tableName} SET ${setClauses} WHERE id = ${id};`;
+  const sql = `UPDATE ${tableName} SET ${setClauses} WHERE ${id_label} = ${id};`;
 
   return sql;
 }
 
 function generateCreateTableSQL(tableName: string, data: DataItem[]): string {
   // Map through data to generate column definitions
+  const fk_array: string[] = [];
   const columnDefinitions = data
     .map((item) => {
       let columnType: string;
+      if (item.fk !== "No") {
+        fk_array.push(item.fk);
+      }
       switch (item.type) {
         case "TEXT":
           columnType = "TEXT";
@@ -135,7 +141,9 @@ function generateCreateTableSQL(tableName: string, data: DataItem[]): string {
     .join(", ");
 
   // Form the SQL statement
-  const sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions});`;
+  const sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions} ${
+    fk_array.length !== 0 ? "," + fk_array.join(",") : ""
+  });`;
 
   return sql;
 }
