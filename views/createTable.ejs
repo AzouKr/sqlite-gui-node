@@ -89,6 +89,33 @@
                 </select>
               </div>
             </div>
+            <div class="create_box" id="fk-input-div">
+              <div class="create_box_top">
+                <label class="form-label">Foreign Key</label><br />
+              </div>
+              <div class="create_box_bottom">
+                <select id="input-fk" class="insert_btn">
+                  <option value="no">No</option>
+                  <option value="yes">Yes</option>
+                </select>
+              </div>
+            </div>
+            <div style="display: none" class="create_box" id="table-input-div">
+              <div class="create_box_top">
+                <label class="form-label">Table</label><br />
+              </div>
+              <div class="create_box_bottom">
+                <select id="input-table" class="insert_btn"></select>
+              </div>
+            </div>
+            <div style="display: none" class="create_box" id="Columns">
+              <div class="create_box_top">
+                <label class="form-label">Columns</label><br />
+              </div>
+              <div class="create_box_bottom">
+                <select id="column-table" class="insert_btn"></select>
+              </div>
+            </div>
             <div class="create_box" id="default-input-div">
               <div class="create_box_top">
                 <label class="form-label">Default Value</label><br />
@@ -108,6 +135,7 @@
                   <th scope="col">Data Type</th>
                   <th scope="col">Primary key</th>
                   <th scope="col">Default value</th>
+                  <th scope="col">Foreign key</th>
                 </tr>
               </thead>
               <tbody></tbody>
