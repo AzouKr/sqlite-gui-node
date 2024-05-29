@@ -56,7 +56,7 @@ function generateInsertSQL(db, tableName, data) {
         return sql;
     });
 }
-function generateUpdateSQL(tableName, data, id) {
+function generateUpdateSQL(tableName, data, id, id_label) {
     // Extract field names and values with proper handling
     const setClauses = data
         .map((item) => {
@@ -76,14 +76,18 @@ function generateUpdateSQL(tableName, data, id) {
     })
         .join(", ");
     // Form the SQL statement
-    const sql = `UPDATE ${tableName} SET ${setClauses} WHERE id = ${id};`;
+    const sql = `UPDATE ${tableName} SET ${setClauses} WHERE ${id_label} = ${id};`;
     return sql;
 }
 function generateCreateTableSQL(tableName, data) {
     // Map through data to generate column definitions
+    const fk_array = [];
     const columnDefinitions = data
         .map((item) => {
         let columnType;
+        if (item.fk !== "No") {
+            fk_array.push(item.fk);
+        }
         switch (item.type) {
             case "TEXT":
                 columnType = "TEXT";
@@ -111,7 +115,13 @@ function generateCreateTableSQL(tableName, data) {
     })
         .join(", ");
     // Form the SQL statement
-    const sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions});`;
+    let sql;
+    if (fk_array.length !== 0) {
+        sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions} ${"," + fk_array.join(",")});`;
+    }
+    else {
+        sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions});`;
+    }
     return sql;
 }
 exports.default = {

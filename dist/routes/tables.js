@@ -61,6 +61,35 @@ function tableRoutes(db) {
         const { name } = req.params;
         try {
             const response = yield databaseFunctions_1.default.fetchTableInfo(db, name);
+            const fk = yield databaseFunctions_1.default.fetchTableForeignKeys(db, name);
+            if (fk.bool && fk.data !== undefined) {
+                fk.data.forEach((element) => {
+                    databaseFunctions_1.default
+                        .fetchFK(db, element.table, element.to)
+                        .then((fk_response) => {
+                        if (response.data !== undefined) {
+                            response.data.forEach((item) => {
+                                if (item.field === element.from) {
+                                    item.fk = fk_response.data.map((obj) => obj[element.to]);
+                                }
+                            });
+                        }
+                        res.status(200).json(response);
+                    });
+                });
+            }
+            else {
+                res.status(200).json(response);
+            }
+        }
+        catch (error) {
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }));
+    router.get("/all/infos/:name", (req, res) => __awaiter(this, void 0, void 0, function* () {
+        const { name } = req.params;
+        try {
+            const response = yield databaseFunctions_1.default.fetchAllTableInfo(db, name);
             res.status(200).json(response);
         }
         catch (error) {
@@ -153,8 +182,8 @@ function tableRoutes(db) {
     }));
     router.post("/update", (req, res) => __awaiter(this, void 0, void 0, function* () {
         try {
-            const { tablename, dataArray, userId } = req.body;
-            const sql = sqlGenerator_1.default.generateUpdateSQL(tablename, dataArray, userId);
+            const { tablename, dataArray, userId, id_label } = req.body;
+            const sql = sqlGenerator_1.default.generateUpdateSQL(tablename, dataArray, userId, id_label);
             const response = yield databaseFunctions_1.default.runQuery(db, sql);
             res.status(200).json(response);
         }
@@ -164,18 +193,18 @@ function tableRoutes(db) {
     }));
     router.post("/generate/update", (req, res) => __awaiter(this, void 0, void 0, function* () {
         try {
-            const { tablename, dataArray, userId } = req.body;
-            const sql = sqlGenerator_1.default.generateUpdateSQL(tablename, dataArray, userId);
+            const { tablename, dataArray, userId, id_label } = req.body;
+            const sql = sqlGenerator_1.default.generateUpdateSQL(tablename, dataArray, userId, id_label);
             res.status(200).json(sql);
         }
         catch (error) {
             res.status(500).json({ message: "Internal server error" });
         }
     }));
-    router.get("/getrecord/:tablename/:id", (req, res) => __awaiter(this, void 0, void 0, function* () {
+    router.get("/getrecord/:tablename/:label/:id", (req, res) => __awaiter(this, void 0, void 0, function* () {
         try {
-            const { tablename, id } = req.params;
-            const response = yield databaseFunctions_1.default.fetchRecord(db, tablename, Number(id));
+            const { tablename, label, id } = req.params;
+            const response = yield databaseFunctions_1.default.fetchRecord(db, tablename, label, Number(id));
             res.status(200).json(response);
         }
         catch (error) {

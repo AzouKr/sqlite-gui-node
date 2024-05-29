@@ -107,9 +107,9 @@ function fetchTable(db, table) {
         });
     });
 }
-function fetchRecord(db, table, id) {
+function fetchRecord(db, table, label, id) {
     return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM ${table} WHERE id = ${id}`, function (error, rows) {
+        db.all(`SELECT * FROM ${table} WHERE ${label} = ${id}`, function (error, rows) {
             if (error) {
                 logger_1.default.error("Error while fetching record");
                 logger_1.default.error(error.message);
@@ -148,6 +148,75 @@ function fetchTableInfo(db, table) {
                 else {
                     resolve({ bool: true, data: tableInfo });
                 }
+            }
+        });
+    });
+}
+function fetchAllTableInfo(db, table) {
+    return new Promise((resolve, reject) => {
+        db.all(`PRAGMA table_info(${table})`, function (error, rows) {
+            if (error) {
+                logger_1.default.error("Error while fetching table info");
+                logger_1.default.error(error.message);
+                reject({ bool: false, error: error.message });
+            }
+            else {
+                // Map the columns to an array of column objects with name and type
+                const tableInfo = rows.map((row) => ({
+                    field: row.name,
+                    type: row.type,
+                }));
+                if (tableInfo.length === 0) {
+                    reject({
+                        bool: false,
+                        error: "No columns to select (all columns are auto-increment).",
+                    });
+                }
+                else {
+                    resolve({ bool: true, data: tableInfo });
+                }
+            }
+        });
+    });
+}
+// Function to fetch foreign key info of a table
+function fetchTableForeignKeys(db, table) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve, reject) => {
+            db.all(`PRAGMA foreign_key_list(${table})`, function (error, rows) {
+                if (error) {
+                    console.error("Error while fetching foreign key info");
+                    console.error(error.message);
+                    reject({ bool: false, error: error.message });
+                }
+                else {
+                    if (rows.length === 0) {
+                        resolve({ bool: false, data: [] });
+                    }
+                    else {
+                        const foreignKeys = rows.map((row) => ({
+                            table: row.table,
+                            from: row.from,
+                            to: row.to,
+                        }));
+                        resolve({ bool: true, data: foreignKeys });
+                    }
+                }
+            });
+        });
+    });
+}
+function fetchFK(db, table, column) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT ${column} from ${table}`, function (error, rows) {
+            if (error) {
+                logger_1.default.error("Error while fetching Foreign keys");
+                logger_1.default.error(error.message);
+                reject({ bool: false, data: [], error: error.message });
+                return;
+            }
+            else {
+                resolve({ bool: true, data: rows });
             }
         });
     });
@@ -241,6 +310,7 @@ exports.default = {
     fetchAllTables,
     fetchTable,
     fetchTableInfo,
+    fetchAllTableInfo,
     deleteFromTable,
     fetchRecord,
     runQuery,
@@ -248,4 +318,6 @@ exports.default = {
     InitializeDB,
     insertQuery,
     fetchQueries,
+    fetchTableForeignKeys,
+    fetchFK,
 };

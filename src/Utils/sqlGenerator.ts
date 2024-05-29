@@ -141,9 +141,14 @@ function generateCreateTableSQL(tableName: string, data: DataItem[]): string {
     .join(", ");
 
   // Form the SQL statement
-  const sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions} ${
-    fk_array.length !== 0 ? "," + fk_array.join(",") : ""
-  });`;
+  let sql;
+  if (fk_array.length !== 0) {
+    sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions} ${
+      "," + fk_array.join(",")
+    });`;
+  } else {
+    sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions});`;
+  }
 
   return sql;
 }
