@@ -412,7 +412,13 @@ function exportDatabaseToSQL(
   db: sqlite3.Database
 ): Promise<{ bool: boolean; filePath?: string; error?: string }> {
   return new Promise((resolve, reject) => {
-    const outputPath = "/Users/mac/Documents/Code/SQLite-GUI/public/output.sql";
+    const outputPath = path.resolve(
+      __dirname,
+      "..",
+      "..",
+      "public",
+      "output.sql"
+    );
     let sql = "";
 
     db.serialize(() => {
