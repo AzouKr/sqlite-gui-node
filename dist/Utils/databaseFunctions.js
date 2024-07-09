@@ -37,6 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = __importDefault(require("./logger")); // Assuming logger is imported from a separate file
 const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 function InitializeDB(db) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
@@ -331,7 +332,7 @@ function deleteFromTable(db, name, id) {
 }
 function exportDatabaseToSQL(db) {
     return new Promise((resolve, reject) => {
-        const outputPath = "/Users/mac/Documents/Code/SQLite-GUI/public/output.sql";
+        const outputPath = path.resolve(__dirname, "..", "..", "public", "output.sql");
         let sql = "";
         db.serialize(() => {
             db.all("SELECT name, sql FROM sqlite_master WHERE type='table'", (err, tables) => {
