@@ -1,6 +1,7 @@
 import * as sqlite3 from "sqlite3"; // Assuming you're using sqlite3
 import logger from "./logger"; // Assuming logger is imported from a separate file
-import { AnyARecord } from "dns";
+import * as fs from "fs";
+import * as path from "path";
 
 // Interface for a Query object (optional for improved type safety)
 interface Query {
@@ -28,6 +29,24 @@ interface FetchTableForeignKeysResult {
   bool: boolean;
   data?: ForeignKeyInfo[];
   error?: string;
+}
+
+interface Table {
+  name: string;
+  sql: string;
+}
+
+interface Column {
+  cid: number;
+  name: string;
+  type: string;
+  notnull: number;
+  dflt_value: any;
+  pk: number;
+}
+
+interface Row {
+  [key: string]: any;
 }
 
 async function InitializeDB(db: sqlite3.Database): Promise<void> {
@@ -389,6 +408,79 @@ function deleteFromTable(
   });
 }
 
+function exportDatabaseToSQL(
+  db: sqlite3.Database
+): Promise<{ bool: boolean; filePath?: string; error?: string }> {
+  return new Promise((resolve, reject) => {
+    const outputPath = "/Users/mac/Documents/Code/SQLite-GUI/public/output.sql";
+    let sql = "";
+
+    db.serialize(() => {
+      db.all(
+        "SELECT name, sql FROM sqlite_master WHERE type='table'",
+        (err, tables: Table[]) => {
+          if (err) {
+            reject({ bool: false, error: err.message });
+            return;
+          }
+
+          let pendingTables = tables.length;
+
+          tables.forEach((table) => {
+            const tableName = table.name;
+            const createTableSQL = table.sql;
+
+            sql += `-- Dumping data for table ${tableName}\n`;
+            sql += `${createTableSQL};\n`;
+
+            db.all(
+              `PRAGMA table_info(${tableName})`,
+              (err, columns: Column[]) => {
+                if (err) {
+                  reject({ bool: false, error: err.message });
+                  return;
+                }
+
+                columns.forEach((column) => {
+                  sql += `-- ${column.cid} | ${column.name} | ${column.type} | ${column.notnull} | ${column.dflt_value} | ${column.pk}\n`;
+                });
+
+                db.all(`SELECT * FROM ${tableName}`, (err, rows: Row[]) => {
+                  if (err) {
+                    reject({ bool: false, error: err.message });
+                    return;
+                  }
+
+                  rows.forEach((row) => {
+                    const columns = Object.keys(row).join(", ");
+                    const values = Object.values(row)
+                      .map((value) => `'${value}'`)
+                      .join(", ");
+                    sql += `INSERT INTO ${tableName} (${columns}) VALUES (${values});\n`;
+                  });
+
+                  pendingTables -= 1;
+
+                  if (pendingTables === 0) {
+                    fs.writeFile(outputPath, sql, (err) => {
+                      if (err) {
+                        reject({ bool: false, error: err.message });
+                        return;
+                      }
+
+                      resolve({ bool: true, filePath: outputPath });
+                    });
+                  }
+                });
+              }
+            );
+          });
+        }
+      );
+    });
+  });
+}
+
 export default {
   checkColumnHasDefault,
   fetchAllTables,
@@ -404,4 +496,5 @@ export default {
   fetchQueries,
   fetchTableForeignKeys,
   fetchFK,
+  exportDatabaseToSQL,
 };

@@ -8,6 +8,7 @@ const router = express.Router();
 function tableRoutes(db: sqlite3.Database) {
   router.get("/", async (req: Request, res: Response) => {
     try {
+      await databaseFunctions.exportDatabaseToSQL(db);
       const tables = await databaseFunctions.fetchAllTables(db);
       res.status(200).json(tables);
     } catch (error) {

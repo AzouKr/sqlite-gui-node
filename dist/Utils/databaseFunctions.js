@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -13,6 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = __importDefault(require("./logger")); // Assuming logger is imported from a separate file
+const fs = __importStar(require("fs"));
 function InitializeDB(db) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
@@ -305,6 +329,59 @@ function deleteFromTable(db, name, id) {
         });
     });
 }
+function exportDatabaseToSQL(db) {
+    return new Promise((resolve, reject) => {
+        const outputPath = "/Users/mac/Documents/Code/SQLite-GUI/public/output.sql";
+        let sql = "";
+        db.serialize(() => {
+            db.all("SELECT name, sql FROM sqlite_master WHERE type='table'", (err, tables) => {
+                if (err) {
+                    reject({ bool: false, error: err.message });
+                    return;
+                }
+                let pendingTables = tables.length;
+                tables.forEach((table) => {
+                    const tableName = table.name;
+                    const createTableSQL = table.sql;
+                    sql += `-- Dumping data for table ${tableName}\n`;
+                    sql += `${createTableSQL};\n`;
+                    db.all(`PRAGMA table_info(${tableName})`, (err, columns) => {
+                        if (err) {
+                            reject({ bool: false, error: err.message });
+                            return;
+                        }
+                        columns.forEach((column) => {
+                            sql += `-- ${column.cid} | ${column.name} | ${column.type} | ${column.notnull} | ${column.dflt_value} | ${column.pk}\n`;
+                        });
+                        db.all(`SELECT * FROM ${tableName}`, (err, rows) => {
+                            if (err) {
+                                reject({ bool: false, error: err.message });
+                                return;
+                            }
+                            rows.forEach((row) => {
+                                const columns = Object.keys(row).join(", ");
+                                const values = Object.values(row)
+                                    .map((value) => `'${value}'`)
+                                    .join(", ");
+                                sql += `INSERT INTO ${tableName} (${columns}) VALUES (${values});\n`;
+                            });
+                            pendingTables -= 1;
+                            if (pendingTables === 0) {
+                                fs.writeFile(outputPath, sql, (err) => {
+                                    if (err) {
+                                        reject({ bool: false, error: err.message });
+                                        return;
+                                    }
+                                    resolve({ bool: true, filePath: outputPath });
+                                });
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
 exports.default = {
     checkColumnHasDefault,
     fetchAllTables,
@@ -320,4 +397,5 @@ exports.default = {
     fetchQueries,
     fetchTableForeignKeys,
     fetchFK,
+    exportDatabaseToSQL,
 };

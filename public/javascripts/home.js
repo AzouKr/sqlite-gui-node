@@ -63,7 +63,6 @@ async function fetchTableData(tableName) {
 function displayTableData(data) {
   const mainBodyDiv = document.querySelector(".main_body");
   mainBodyDiv.innerHTML = ""; // Clear previous data
-
   const headerDiv = document.createElement("div");
   headerDiv.classList.add("main_body_header");
 
