@@ -18,12 +18,6 @@ jobs:
         with:
           node-version: '14' # specify the Node.js version you need
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project
-        run: npm run build # or any other build command your project requires
-
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
