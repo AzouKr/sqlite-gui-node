@@ -125,7 +125,7 @@ function tableRoutes(db: sqlite3.Database) {
       if (lowersqlQuery.startsWith("select")) {
         const response = await databaseFunctions.runSelectQuery(
           db,
-          lowersqlQuery
+          sqlQuery
         );
         if (lowersqlQuery.startsWith("select count(*)")) {
           if (response.data !== undefined) {
