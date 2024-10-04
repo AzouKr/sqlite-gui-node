@@ -245,7 +245,7 @@ async function createForm() {
           throw new Error("Network response was not ok");
         }
         // Handle response if needed
-        window.location.href = `/`;
+        window.location.href = `/home`;
       })
       .catch((error) => {
         console.error("Error creating table:", error);

@@ -127,7 +127,7 @@ function displayTableData(fields) {
       }
 
       // Handle response if needed
-      window.location.href = `/`;
+      window.location.href = `/home`;
     } catch (error) {
       console.error(error);
       alert(

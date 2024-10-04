@@ -123,7 +123,7 @@ function tableRoutes(db) {
             const { sqlQuery } = req.body;
             const lowersqlQuery = sqlQuery.toLowerCase();
             if (lowersqlQuery.startsWith("select")) {
-                const response = yield databaseFunctions_1.default.runSelectQuery(db, lowersqlQuery);
+                const response = yield databaseFunctions_1.default.runSelectQuery(db, sqlQuery);
                 if (lowersqlQuery.startsWith("select count(*)")) {
                     if (response.data !== undefined) {
                         res.status(200).json({

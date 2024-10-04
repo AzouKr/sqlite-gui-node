@@ -28,7 +28,7 @@ app.use(body_parser_1.default.json());
 app.get("/query", (req, res) => {
     res.render("query", { title: "Query Page" });
 });
-app.get("/", (req, res) => {
+app.get("/home", (req, res) => {
     res.render("index", { title: "Home Page" });
 });
 app.get("/createtable", (req, res) => {
@@ -43,13 +43,62 @@ app.get("/edit/:table/:label/:id", (req, res) => {
     const id = req.params.id;
     res.render("edit", { tableName, id });
 });
+// SqliteGuiNode function to run the app
 function SqliteGuiNode(db_1) {
     return __awaiter(this, arguments, void 0, function* (db, port = 8080) {
         yield databaseFunctions_1.default.InitializeDB(db);
         app.use("/api/tables", (0, tables_1.default)(db));
         app.listen(port, () => {
-            logger_1.default.info(`SQLite Web Admin Tool running at http://localhost:${port}`);
+            logger_1.default.info(`SQLite Web Admin Tool running at http://localhost:${port}/home`);
         });
     });
 }
-module.exports = SqliteGuiNode;
+// SqliteGuiNode as middleware
+function SqliteGuiNodeMiddleware(app, db) {
+    return function (req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield databaseFunctions_1.default.InitializeDB(db);
+                app.set("view engine", "ejs");
+                app.set("views", path_1.default.join(__dirname, "../views"));
+                app.use(body_parser_1.default.urlencoded({ extended: false }));
+                app.use(express_1.default.static(path_1.default.join(__dirname, "../public")));
+                app.use(body_parser_1.default.json());
+                // Routes
+                app.get("/query", (req, res) => {
+                    res.render("query", { title: "Query Page" });
+                });
+                app.get("/", (req, res) => {
+                    res.render("index", { title: "Home Page" });
+                });
+                app.get("/createtable", (req, res) => {
+                    res.render("createTable", { title: "Create Table Page" });
+                });
+                app.get("/insert/:table", (req, res) => {
+                    const tableName = req.params.table;
+                    res.render("insert", { tableName });
+                });
+                app.get("/edit/:table/:label/:id", (req, res) => {
+                    const tableName = req.params.table;
+                    const id = req.params.id;
+                    res.render("edit", { tableName, id });
+                });
+                app.use("/api/tables", (0, tables_1.default)(db)); // Add table routes
+                app.get("/home", (req, res) => {
+                    res.render("index", { title: "Home Page" });
+                });
+                next(); // Proceed to the next middleware/route handler
+            }
+            catch (error) {
+                // Handle any errors during DB initialization
+                logger_1.default.error("Error initializing the database:", error);
+                res.status(500).send("Error initializing the database.");
+            }
+        });
+    };
+}
+// Export both SqliteGuiNode and SqliteGuiNodeMiddleware
+module.exports = {
+    SqliteGuiNode,
+    SqliteGuiNodeMiddleware,
+};

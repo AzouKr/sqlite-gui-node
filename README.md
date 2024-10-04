@@ -10,6 +10,7 @@
 
 - [Installation](#installation)
 - [Using a Custom Port](#using-a-custom-port)
+- [Using it as Express Js Middleware](#using-it-as-express-js-middleware)
 - [Arguments](#arguments)
 - [Features](#features)
 - [Updating the Package](#updating-the-package)
@@ -38,7 +39,7 @@ const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("app.db");
 // Import the package
-const SqliteGuiNode = require("sqlite-gui-node");
+const { SqliteGuiNode } = require("sqlite-gui-node");
 
 const app = express();
 
@@ -52,7 +53,7 @@ app.listen(4000);
 
 ### Step 3: Access the GUI
 
-Once the GUI is started, you can access it via a web browser. By default, it runs on http://localhost:8080. Open your browser and navigate to this URL to start performing CRUD operations on your SQLite database.
+Once the GUI is started, you can access it via a web browser. By default, it runs on http://localhost:8080/home. Open your browser and navigate to this URL to start performing CRUD operations on your SQLite database.
 
 ## Using a Custom Port
 
@@ -63,6 +64,25 @@ If you want to use a specific port, you can pass it as the second argument when 
 SqliteGuiNode(db, 3005).catch((err) => {
   console.error("Error starting the server:", err);
 });
+```
+
+## Using it as Express Js Middleware
+
+If you want to use it in the same port as express, you can use `SqliteGuiNodeMiddleware`:
+
+```js
+const express = require("express");
+// import the SQLite DB that you use
+const sqlite3 = require("sqlite3").verbose();
+const db = new sqlite3.Database("app.db");
+// Import the package
+const { SqliteGuiNodeMiddleware } = require("sqlite-gui-node");
+
+const app = express();
+// Example usage of middleware
+app.use(SqliteGuiNodeMiddleware(app, db));
+
+app.listen(4000);
 ```
 
 ## Arguments

@@ -20,7 +20,7 @@ app.get("/query", (req, res) => {
   res.render("query", { title: "Query Page" });
 });
 
-app.get("/", (req, res) => {
+app.get("/home", (req, res) => {
   res.render("index", { title: "Home Page" });
 });
 
@@ -39,12 +39,68 @@ app.get("/edit/:table/:label/:id", (req, res) => {
   res.render("edit", { tableName, id });
 });
 
+// SqliteGuiNode function to run the app
 async function SqliteGuiNode(db: sqlite3.Database, port = 8080) {
   await databaseFunctions.InitializeDB(db);
   app.use("/api/tables", tableRoutes(db));
   app.listen(port, () => {
-    logger.info(`SQLite Web Admin Tool running at http://localhost:${port}`);
+    logger.info(
+      `SQLite Web Admin Tool running at http://localhost:${port}/home`
+    );
   });
 }
 
-module.exports = SqliteGuiNode;
+// SqliteGuiNode as middleware
+function SqliteGuiNodeMiddleware(app: any, db: sqlite3.Database) {
+  return async function (req: any, res: any, next: any) {
+    try {
+      await databaseFunctions.InitializeDB(db);
+      app.set("view engine", "ejs");
+      app.set("views", path.join(__dirname, "../views"));
+
+      app.use(bodyParser.urlencoded({ extended: false }));
+      app.use(express.static(path.join(__dirname, "../public")));
+      app.use(bodyParser.json());
+
+      // Routes
+      app.get("/query", (req: any, res: any) => {
+        res.render("query", { title: "Query Page" });
+      });
+
+      app.get("/", (req: any, res: any) => {
+        res.render("index", { title: "Home Page" });
+      });
+
+      app.get("/createtable", (req: any, res: any) => {
+        res.render("createTable", { title: "Create Table Page" });
+      });
+
+      app.get("/insert/:table", (req: any, res: any) => {
+        const tableName = req.params.table;
+        res.render("insert", { tableName });
+      });
+
+      app.get("/edit/:table/:label/:id", (req: any, res: any) => {
+        const tableName = req.params.table;
+        const id = req.params.id;
+        res.render("edit", { tableName, id });
+      });
+      app.use("/api/tables", tableRoutes(db)); // Add table routes
+      app.get("/home", (req: any, res: any) => {
+        res.render("index", { title: "Home Page" });
+      });
+
+      next(); // Proceed to the next middleware/route handler
+    } catch (error) {
+      // Handle any errors during DB initialization
+      logger.error("Error initializing the database:", error);
+      res.status(500).send("Error initializing the database.");
+    }
+  };
+}
+
+// Export both SqliteGuiNode and SqliteGuiNodeMiddleware
+module.exports = {
+  SqliteGuiNode,
+  SqliteGuiNodeMiddleware,
+};

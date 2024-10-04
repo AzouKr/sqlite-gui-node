@@ -159,7 +159,7 @@ function displayTableData(fields, dataObject) {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        window.location.href = `/`;
+        window.location.href = `/home`;
       })
       .catch((error) => {
         console.error("Error updating data:", error);
