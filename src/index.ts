@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import path from "path";
 import databaseFunctions from "./Utils/databaseFunctions";
@@ -52,7 +52,7 @@ async function SqliteGuiNode(db: sqlite3.Database, port = 8080) {
 
 // SqliteGuiNode as middleware
 function SqliteGuiNodeMiddleware(app: any, db: sqlite3.Database) {
-  return async function (req: any, res: any, next: any) {
+  return async function (req: Request, res: Response, next: NextFunction) {
     try {
       await databaseFunctions.InitializeDB(db);
       app.set("view engine", "ejs");
@@ -63,30 +63,30 @@ function SqliteGuiNodeMiddleware(app: any, db: sqlite3.Database) {
       app.use(bodyParser.json());
 
       // Routes
-      app.get("/query", (req: any, res: any) => {
+      app.get("/query", (req: Request, res: Response) => {
         res.render("query", { title: "Query Page" });
       });
 
-      app.get("/", (req: any, res: any) => {
+      app.get("/", (req: Request, res: Response) => {
         res.render("index", { title: "Home Page" });
       });
 
-      app.get("/createtable", (req: any, res: any) => {
+      app.get("/createtable", (req: Request, res: Response) => {
         res.render("createTable", { title: "Create Table Page" });
       });
 
-      app.get("/insert/:table", (req: any, res: any) => {
+      app.get("/insert/:table", (req: Request, res: Response) => {
         const tableName = req.params.table;
         res.render("insert", { tableName });
       });
 
-      app.get("/edit/:table/:label/:id", (req: any, res: any) => {
+      app.get("/edit/:table/:label/:id", (req: Request, res: Response) => {
         const tableName = req.params.table;
         const id = req.params.id;
         res.render("edit", { tableName, id });
       });
       app.use("/api/tables", tableRoutes(db)); // Add table routes
-      app.get("/home", (req: any, res: any) => {
+      app.get("/home", (req: Request, res: Response) => {
         res.render("index", { title: "Home Page" });
       });
 
