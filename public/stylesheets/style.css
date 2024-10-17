@@ -1,15 +1,15 @@
 .page_body {
+  height: 100vh;
   display: flex;
   height: fit-content;
+  max-width: 100vw;
 }
 
 .sidebar {
-  height: 100vh;
   width: 20vw;
   min-width: 40vh;
   padding: 2vh;
   background-color: #35374a;
-  position: fixed;
   overflow: auto;
 }
 
@@ -44,7 +44,7 @@
 
 .create_btn {
   width: 90%;
-  height: 5vh;
+  min-height: 5vh;
   background-color: #4040e8;
   border: none;
   border-radius: 1vh;
@@ -71,9 +71,11 @@
 }
 
 .right_side {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-  width: 100%;
-  margin-left: 41vh;
+  width: calc(100% - 20vw);
+  max-width: calc(100% - 40vh);
 }
 
 .header {
@@ -82,8 +84,8 @@
 }
 
 .main_body {
-  min-height: 100vh;
-  width: 80vw;
+  flex: 1;
+  overflow: auto;
   padding: 5vh;
   background-color: #e9e9e9;
 }
@@ -130,13 +132,12 @@
   width: 100%;
   display: flex;
   align-items: center;
-  padding-top: 10vh;
   padding-bottom: 10vh;
 }
 
 .insert_btn {
   padding: 0 2vh;
-  height: 5vh;
+  min-height: 5vh;
   background-color: #79bfb3;
   border: none;
   border-radius: 1vh;
@@ -150,8 +151,8 @@
 }
 
 .delete_btn {
-  width: 15vh;
-  height: 5vh;
+  min-width: 15vh;
+  min-height: 5vh;
   background-color: #ff0000;
   border: none;
   border-radius: 1vh;
