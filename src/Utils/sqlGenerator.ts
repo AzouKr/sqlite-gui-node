@@ -10,6 +10,9 @@ interface DataItem {
   default?: string | number | null; // Optional default value
 }
 
+const shouldEscapeValue = (item: DataItem) =>
+  item.type === "text" || item.type === "blob" || item.type.match(/^varchar/i);
+
 async function generateInsertSQL(
   db: any,
   tableName: string,
@@ -30,10 +33,7 @@ async function generateInsertSQL(
         if (!hasDefault.bool) {
           // doesn't have default value
           columns.push(item.field);
-          if (
-            item.type.toUpperCase() === "TEXT" ||
-            item.type.toUpperCase() === "BLOB"
-          ) {
+          if (shouldEscapeValue(item)) {
             values.push(
               item.value !== ""
                 ? `'${String(item.value).replace(/'/g, "''")}'`
@@ -48,10 +48,7 @@ async function generateInsertSQL(
       } else {
         // doesn't have default value
         columns.push(item.field);
-        if (
-          item.type.toUpperCase() === "TEXT" ||
-          item.type.toUpperCase() === "BLOB"
-        ) {
+        if (shouldEscapeValue(item)) {
           values.push(
             item.value !== ""
               ? `'${String(item.value).replace(/'/g, "''")}'`
@@ -88,7 +85,7 @@ function generateUpdateSQL(
         item.value === undefined
       ) {
         value = "NULL";
-      } else if (item.type === "TEXT") {
+      } else if (shouldEscapeValue(item)) {
         value = `'${String(item.value).replace(/'/g, "''")}'`; // Escape single quotes
       } else {
         value = item.value.toString(); // Ensure string representation for database
