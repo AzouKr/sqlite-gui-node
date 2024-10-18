@@ -38,6 +38,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = __importDefault(require("./logger")); // Assuming logger is imported from a separate file
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const helpers_1 = require("./helpers");
 function InitializeDB(db) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
@@ -119,7 +120,7 @@ function fetchAllTables(db) {
 }
 function fetchTable(db, table) {
     return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM ${table}`, function (error, rows) {
+        db.all(`SELECT * FROM ${(0, helpers_1.quoteColumn)(table)}`, function (error, rows) {
             if (error) {
                 logger_1.default.error("Error while fetching table");
                 logger_1.default.error(error.message);
@@ -134,7 +135,7 @@ function fetchTable(db, table) {
 }
 function fetchRecord(db, table, label, id) {
     return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM ${table} WHERE ${label} = ${id}`, function (error, rows) {
+        db.all(`SELECT * FROM ${(0, helpers_1.quoteColumn)(table)} WHERE ${label} = ${id}`, function (error, rows) {
             if (error) {
                 logger_1.default.error("Error while fetching record");
                 logger_1.default.error(error.message);
@@ -149,7 +150,7 @@ function fetchRecord(db, table, label, id) {
 }
 function fetchTableInfo(db, table) {
     return new Promise((resolve, reject) => {
-        db.all(`PRAGMA table_info(${table})`, function (error, rows) {
+        db.all(`PRAGMA table_info(${(0, helpers_1.quoteColumn)(table)})`, function (error, rows) {
             if (error) {
                 logger_1.default.error("Error while fetching table info");
                 logger_1.default.error(error.message);
@@ -179,7 +180,7 @@ function fetchTableInfo(db, table) {
 }
 function fetchAllTableInfo(db, table) {
     return new Promise((resolve, reject) => {
-        db.all(`PRAGMA table_info(${table})`, function (error, rows) {
+        db.all(`PRAGMA table_info(${(0, helpers_1.quoteColumn)(table)})`, function (error, rows) {
             if (error) {
                 logger_1.default.error("Error while fetching table info");
                 logger_1.default.error(error.message);
@@ -208,7 +209,7 @@ function fetchAllTableInfo(db, table) {
 function fetchTableForeignKeys(db, table) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
-            db.all(`PRAGMA foreign_key_list(${table})`, function (error, rows) {
+            db.all(`PRAGMA foreign_key_list(${(0, helpers_1.quoteColumn)(table)})`, function (error, rows) {
                 if (error) {
                     console.error("Error while fetching foreign key info");
                     console.error(error.message);
@@ -233,7 +234,7 @@ function fetchTableForeignKeys(db, table) {
 }
 function fetchFK(db, table, column) {
     return new Promise((resolve, reject) => {
-        db.all(`SELECT ${column} from ${table}`, function (error, rows) {
+        db.all(`SELECT ${(0, helpers_1.quoteColumn)(column)} from ${(0, helpers_1.quoteColumn)(table)}`, function (error, rows) {
             if (error) {
                 logger_1.default.error("Error while fetching Foreign keys");
                 logger_1.default.error(error.message);
@@ -283,7 +284,7 @@ function checkColumnHasDefault(db, tableName, columnType, columnName) {
             const sql = `
                 SELECT sql
                 FROM sqlite_master
-                WHERE type = 'table' AND name = '${tableName}'
+                WHERE type = 'table' AND name = '${(0, helpers_1.quoteColumn)(tableName)}'
             `;
             // Execute the SQL query
             db.get(sql, [], (err, row) => {
@@ -300,7 +301,7 @@ function checkColumnHasDefault(db, tableName, columnType, columnName) {
                     return;
                 }
                 // Check if the SQL definition contains the column name and the word "DEFAULT"
-                const hasDefault = row.sql.includes(`${columnName} ${columnType} DEFAULT`);
+                const hasDefault = row.sql.includes(`${(0, helpers_1.quoteColumn)(columnName)} ${columnType} DEFAULT`);
                 // Return the result
                 resolve({ bool: hasDefault, message: "" });
             });
@@ -344,9 +345,9 @@ function exportDatabaseToSQL(db) {
                 tables.forEach((table) => {
                     const tableName = table.name;
                     const createTableSQL = table.sql;
-                    sql += `-- Dumping data for table ${tableName}\n`;
+                    sql += `-- Dumping data for table ${(0, helpers_1.quoteColumn)(tableName)}\n`;
                     sql += `${createTableSQL};\n`;
-                    db.all(`PRAGMA table_info(${tableName})`, (err, columns) => {
+                    db.all(`PRAGMA table_info(${(0, helpers_1.quoteColumn)(tableName)})`, (err, columns) => {
                         if (err) {
                             reject({ bool: false, error: err.message });
                             return;
@@ -354,17 +355,17 @@ function exportDatabaseToSQL(db) {
                         columns.forEach((column) => {
                             sql += `-- ${column.cid} | ${column.name} | ${column.type} | ${column.notnull} | ${column.dflt_value} | ${column.pk}\n`;
                         });
-                        db.all(`SELECT * FROM ${tableName}`, (err, rows) => {
+                        db.all(`SELECT * FROM ${(0, helpers_1.quoteColumn)(tableName)}`, (err, rows) => {
                             if (err) {
                                 reject({ bool: false, error: err.message });
                                 return;
                             }
                             rows.forEach((row) => {
-                                const columns = Object.keys(row).join(", ");
+                                const columns = Object.keys(row).map(helpers_1.quoteColumn).join(", ");
                                 const values = Object.values(row)
                                     .map((value) => `'${value}'`)
                                     .join(", ");
-                                sql += `INSERT INTO ${tableName} (${columns}) VALUES (${values});\n`;
+                                sql += `INSERT INTO ${(0, helpers_1.quoteColumn)(tableName)} (${columns}) VALUES (${values});\n`;
                             });
                             pendingTables -= 1;
                             if (pendingTables === 0) {
