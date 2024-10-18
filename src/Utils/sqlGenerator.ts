@@ -10,8 +10,24 @@ interface DataItem {
   default?: string | number | null; // Optional default value
 }
 
-const shouldQuoteValue = (item: DataItem) =>
-  item.type === "text" || item.type === "blob" || item.type.match(/^varchar/i);
+// Consider null, undefined and "" as empty, but not 0
+const isEmpty = (value: string | number | null | undefined) =>
+  !value && value !== 0;
+
+const quoteValue = (item: DataItem): string => {
+  const shouldQuote =
+    item.type === "text" ||
+    item.type === "blob" ||
+    item.type.match(/^varchar/i);
+
+  if (isEmpty(item.value)) return "NULL";
+
+  return shouldQuote
+    ? `'${String(item.value).replace(/'/g, "''")}'`
+    : String(item.value);
+};
+
+const quoteColumn = (columnOrTable: string) => "`" + columnOrTable + "`";
 
 async function generateInsertSQL(
   db: any,
@@ -21,6 +37,7 @@ async function generateInsertSQL(
   // Extract field names and escape values (optional for TEXT and BLOB)
   const columns: string[] = [];
   const values: string[] = [];
+
   await Promise.all(
     data.map(async (item) => {
       const hasDefault = await databaseFunctions.checkColumnHasDefault(
@@ -29,35 +46,11 @@ async function generateInsertSQL(
         item.type.toUpperCase(),
         item.field
       );
-      if (item.value === "") {
-        if (!hasDefault.bool) {
-          // doesn't have default value
-          columns.push(item.field);
-          if (shouldQuoteValue(item)) {
-            values.push(
-              item.value !== ""
-                ? `'${String(item.value).replace(/'/g, "''")}'`
-                : "NULL" // Escape single quotes or use NULL
-            );
-          } else {
-            values.push(
-              String(item.value) !== "" ? String(item.value) : "NULL"
-            ); // Include NULL for empty values
-          }
-        }
-      } else {
-        // doesn't have default value
-        columns.push(item.field);
-        if (shouldQuoteValue(item)) {
-          values.push(
-            item.value !== ""
-              ? `'${String(item.value).replace(/'/g, "''")}'`
-              : "NULL" // Escape single quotes or use NULL
-          );
-        } else {
-          values.push(String(item.value) !== "" ? String(item.value) : "NULL"); // Include NULL for empty values
-        }
-      }
+
+      if (isEmpty(item.value) && hasDefault.bool) return;
+
+      columns.push(quoteColumn(item.field));
+      values.push(quoteValue(item));
     })
   );
 
@@ -77,25 +70,13 @@ function generateUpdateSQL(
 ): string {
   // Extract field names and values with proper handling
   const setClauses = data
-    .map((item) => {
-      let value: string;
-      if (
-        item.value === null ||
-        item.value === "" ||
-        item.value === undefined
-      ) {
-        value = "NULL";
-      } else if (shouldQuoteValue(item)) {
-        value = `'${String(item.value).replace(/'/g, "''")}'`; // Escape single quotes
-      } else {
-        value = item.value.toString(); // Ensure string representation for database
-      }
-      return `${item.field} = ${value}`;
-    })
+    .map((item) => `${quoteColumn(item.field)} = ${quoteValue(item)}`)
     .join(", ");
 
   // Form the SQL statement
-  const sql = `UPDATE ${tableName} SET ${setClauses} WHERE ${id_label} = ${id};`;
+  const sql = `UPDATE ${quoteColumn(
+    tableName
+  )} SET ${setClauses} WHERE ${id_label} = ${id};`;
 
   return sql;
 }
@@ -126,7 +107,7 @@ function generateCreateTableSQL(tableName: string, data: DataItem[]): string {
           throw new Error(`Unknown type: ${item.type}`);
       }
 
-      let columnDefinition = `${item.name} ${columnType}`;
+      let columnDefinition = `${quoteColumn(item.name)} ${columnType}`;
       if (item.pk) {
         columnDefinition += ` ${item.pk}`; // Include primary key constraint
       }
@@ -140,11 +121,13 @@ function generateCreateTableSQL(tableName: string, data: DataItem[]): string {
   // Form the SQL statement
   let sql;
   if (fk_array.length !== 0) {
-    sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions} ${
-      "," + fk_array.join(",")
-    });`;
+    sql = `CREATE TABLE IF NOT EXISTS ${quoteColumn(
+      tableName
+    )} (${columnDefinitions} ${"," + fk_array.join(",")});`;
   } else {
-    sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions});`;
+    sql = `CREATE TABLE IF NOT EXISTS ${quoteColumn(
+      tableName
+    )} (${columnDefinitions});`;
   }
 
   return sql;

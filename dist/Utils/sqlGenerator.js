@@ -13,7 +13,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const databaseFunctions_1 = __importDefault(require("./databaseFunctions"));
-const shouldQuoteValue = (item) => item.type === "text" || item.type === "blob" || item.type.match(/^varchar/i);
+// Consider null, undefined and "" as empty, but not 0
+const isEmpty = (value) => !value && value !== 0;
+const quoteValue = (item) => {
+    const shouldQuote = item.type === "text" ||
+        item.type === "blob" ||
+        item.type.match(/^varchar/i);
+    if (isEmpty(item.value))
+        return "NULL";
+    return shouldQuote
+        ? `'${String(item.value).replace(/'/g, "''")}'`
+        : String(item.value);
+};
+const quoteColumn = (columnOrTable) => "`" + columnOrTable + "`";
 function generateInsertSQL(db, tableName, data) {
     return __awaiter(this, void 0, void 0, function* () {
         // Extract field names and escape values (optional for TEXT and BLOB)
@@ -21,34 +33,10 @@ function generateInsertSQL(db, tableName, data) {
         const values = [];
         yield Promise.all(data.map((item) => __awaiter(this, void 0, void 0, function* () {
             const hasDefault = yield databaseFunctions_1.default.checkColumnHasDefault(db, tableName, item.type.toUpperCase(), item.field);
-            if (item.value === "") {
-                if (!hasDefault.bool) {
-                    // doesn't have default value
-                    columns.push(item.field);
-                    if (shouldQuoteValue(item)) {
-                        values.push(item.value !== ""
-                            ? `'${String(item.value).replace(/'/g, "''")}'`
-                            : "NULL" // Escape single quotes or use NULL
-                        );
-                    }
-                    else {
-                        values.push(String(item.value) !== "" ? String(item.value) : "NULL"); // Include NULL for empty values
-                    }
-                }
-            }
-            else {
-                // doesn't have default value
-                columns.push(item.field);
-                if (shouldQuoteValue(item)) {
-                    values.push(item.value !== ""
-                        ? `'${String(item.value).replace(/'/g, "''")}'`
-                        : "NULL" // Escape single quotes or use NULL
-                    );
-                }
-                else {
-                    values.push(String(item.value) !== "" ? String(item.value) : "NULL"); // Include NULL for empty values
-                }
-            }
+            if (isEmpty(item.value) && hasDefault.bool)
+                return;
+            columns.push(quoteColumn(item.field));
+            values.push(quoteValue(item));
         })));
         // Form the SQL statement
         const sql = `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${values.join(", ")});`;
@@ -58,24 +46,10 @@ function generateInsertSQL(db, tableName, data) {
 function generateUpdateSQL(tableName, data, id, id_label) {
     // Extract field names and values with proper handling
     const setClauses = data
-        .map((item) => {
-        let value;
-        if (item.value === null ||
-            item.value === "" ||
-            item.value === undefined) {
-            value = "NULL";
-        }
-        else if (shouldQuoteValue(item)) {
-            value = `'${String(item.value).replace(/'/g, "''")}'`; // Escape single quotes
-        }
-        else {
-            value = item.value.toString(); // Ensure string representation for database
-        }
-        return `${item.field} = ${value}`;
-    })
+        .map((item) => `${quoteColumn(item.field)} = ${quoteValue(item)}`)
         .join(", ");
     // Form the SQL statement
-    const sql = `UPDATE ${tableName} SET ${setClauses} WHERE ${id_label} = ${id};`;
+    const sql = `UPDATE ${quoteColumn(tableName)} SET ${setClauses} WHERE ${id_label} = ${id};`;
     return sql;
 }
 function generateCreateTableSQL(tableName, data) {
@@ -103,7 +77,7 @@ function generateCreateTableSQL(tableName, data) {
             default:
                 throw new Error(`Unknown type: ${item.type}`);
         }
-        let columnDefinition = `${item.name} ${columnType}`;
+        let columnDefinition = `${quoteColumn(item.name)} ${columnType}`;
         if (item.pk) {
             columnDefinition += ` ${item.pk}`; // Include primary key constraint
         }
@@ -116,10 +90,10 @@ function generateCreateTableSQL(tableName, data) {
     // Form the SQL statement
     let sql;
     if (fk_array.length !== 0) {
-        sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions} ${"," + fk_array.join(",")});`;
+        sql = `CREATE TABLE IF NOT EXISTS ${quoteColumn(tableName)} (${columnDefinitions} ${"," + fk_array.join(",")});`;
     }
     else {
-        sql = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions});`;
+        sql = `CREATE TABLE IF NOT EXISTS ${quoteColumn(tableName)} (${columnDefinitions});`;
     }
     return sql;
 }
