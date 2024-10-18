@@ -1,12 +1,4 @@
-interface DataItem {
-  field: string;
-  name: string;
-  type: string;
-  value?: string | number | null; // Optional value based on type
-  pk?: string; // Optional primary key constraint
-  fk: string;
-  default?: string | number | null; // Optional default value
-}
+import type { DataItem } from "../types";
 
 // Consider null, undefined and "" as empty, but not 0
 export const isEmpty = (value: string | number | null | undefined) =>

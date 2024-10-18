@@ -1,15 +1,6 @@
+import type { DataItem } from "../types";
 import databaseFunctions from "./databaseFunctions";
 import { isEmpty, quoteColumn as q, quoteValue } from "./helpers";
-
-interface DataItem {
-  field: string;
-  name: string;
-  type: string;
-  value?: string | number | null; // Optional value based on type
-  pk?: string; // Optional primary key constraint
-  fk: string;
-  default?: string | number | null; // Optional default value
-}
 
 async function generateInsertSQL(
   db: any,
