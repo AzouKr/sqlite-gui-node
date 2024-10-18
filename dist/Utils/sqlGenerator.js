@@ -13,19 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const databaseFunctions_1 = __importDefault(require("./databaseFunctions"));
-// Consider null, undefined and "" as empty, but not 0
-const isEmpty = (value) => !value && value !== 0;
-const quoteValue = (item) => {
-    const shouldQuote = item.type === "text" ||
-        item.type === "blob" ||
-        item.type.match(/^varchar/i);
-    if (isEmpty(item.value))
-        return "NULL";
-    return shouldQuote
-        ? `'${String(item.value).replace(/'/g, "''")}'`
-        : String(item.value);
-};
-const quoteColumn = (columnOrTable) => "`" + columnOrTable + "`";
+const helpers_1 = require("./helpers");
 function generateInsertSQL(db, tableName, data) {
     return __awaiter(this, void 0, void 0, function* () {
         // Extract field names and escape values (optional for TEXT and BLOB)
@@ -33,10 +21,10 @@ function generateInsertSQL(db, tableName, data) {
         const values = [];
         yield Promise.all(data.map((item) => __awaiter(this, void 0, void 0, function* () {
             const hasDefault = yield databaseFunctions_1.default.checkColumnHasDefault(db, tableName, item.type.toUpperCase(), item.field);
-            if (isEmpty(item.value) && hasDefault.bool)
+            if ((0, helpers_1.isEmpty)(item.value) && hasDefault.bool)
                 return;
-            columns.push(quoteColumn(item.field));
-            values.push(quoteValue(item));
+            columns.push((0, helpers_1.quoteColumn)(item.field));
+            values.push((0, helpers_1.quoteValue)(item));
         })));
         // Form the SQL statement
         const sql = `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${values.join(", ")});`;
@@ -46,10 +34,10 @@ function generateInsertSQL(db, tableName, data) {
 function generateUpdateSQL(tableName, data, id, id_label) {
     // Extract field names and values with proper handling
     const setClauses = data
-        .map((item) => `${quoteColumn(item.field)} = ${quoteValue(item)}`)
+        .map((item) => `${(0, helpers_1.quoteColumn)(item.field)} = ${(0, helpers_1.quoteValue)(item)}`)
         .join(", ");
     // Form the SQL statement
-    const sql = `UPDATE ${quoteColumn(tableName)} SET ${setClauses} WHERE ${id_label} = ${id};`;
+    const sql = `UPDATE ${(0, helpers_1.quoteColumn)(tableName)} SET ${setClauses} WHERE ${id_label} = ${id};`;
     return sql;
 }
 function generateCreateTableSQL(tableName, data) {
@@ -77,7 +65,7 @@ function generateCreateTableSQL(tableName, data) {
             default:
                 throw new Error(`Unknown type: ${item.type}`);
         }
-        let columnDefinition = `${quoteColumn(item.name)} ${columnType}`;
+        let columnDefinition = `${(0, helpers_1.quoteColumn)(item.name)} ${columnType}`;
         if (item.pk) {
             columnDefinition += ` ${item.pk}`; // Include primary key constraint
         }
@@ -88,13 +76,8 @@ function generateCreateTableSQL(tableName, data) {
     })
         .join(", ");
     // Form the SQL statement
-    let sql;
-    if (fk_array.length !== 0) {
-        sql = `CREATE TABLE IF NOT EXISTS ${quoteColumn(tableName)} (${columnDefinitions} ${"," + fk_array.join(",")});`;
-    }
-    else {
-        sql = `CREATE TABLE IF NOT EXISTS ${quoteColumn(tableName)} (${columnDefinitions});`;
-    }
+    const fkExtra = fk_array.length ? `${"," + fk_array.join(",")}` : "";
+    const sql = `CREATE TABLE IF NOT EXISTS ${(0, helpers_1.quoteColumn)(tableName)} (${columnDefinitions} ${fkExtra});`;
     return sql;
 }
 exports.default = {

@@ -1,4 +1,5 @@
 import databaseFunctions from "./databaseFunctions";
+import { isEmpty, quoteColumn as q, quoteValue } from "./helpers";
 
 interface DataItem {
   field: string;
@@ -9,25 +10,6 @@ interface DataItem {
   fk: string;
   default?: string | number | null; // Optional default value
 }
-
-// Consider null, undefined and "" as empty, but not 0
-const isEmpty = (value: string | number | null | undefined) =>
-  !value && value !== 0;
-
-const quoteValue = (item: DataItem): string => {
-  const shouldQuote =
-    item.type === "text" ||
-    item.type === "blob" ||
-    item.type.match(/^varchar/i);
-
-  if (isEmpty(item.value)) return "NULL";
-
-  return shouldQuote
-    ? `'${String(item.value).replace(/'/g, "''")}'`
-    : String(item.value);
-};
-
-const quoteColumn = (columnOrTable: string) => "`" + columnOrTable + "`";
 
 async function generateInsertSQL(
   db: any,
@@ -49,7 +31,7 @@ async function generateInsertSQL(
 
       if (isEmpty(item.value) && hasDefault.bool) return;
 
-      columns.push(quoteColumn(item.field));
+      columns.push(q(item.field));
       values.push(quoteValue(item));
     })
   );
@@ -70,11 +52,11 @@ function generateUpdateSQL(
 ): string {
   // Extract field names and values with proper handling
   const setClauses = data
-    .map((item) => `${quoteColumn(item.field)} = ${quoteValue(item)}`)
+    .map((item) => `${q(item.field)} = ${quoteValue(item)}`)
     .join(", ");
 
   // Form the SQL statement
-  const sql = `UPDATE ${quoteColumn(
+  const sql = `UPDATE ${q(
     tableName
   )} SET ${setClauses} WHERE ${id_label} = ${id};`;
 
@@ -107,7 +89,7 @@ function generateCreateTableSQL(tableName: string, data: DataItem[]): string {
           throw new Error(`Unknown type: ${item.type}`);
       }
 
-      let columnDefinition = `${quoteColumn(item.name)} ${columnType}`;
+      let columnDefinition = `${q(item.name)} ${columnType}`;
       if (item.pk) {
         columnDefinition += ` ${item.pk}`; // Include primary key constraint
       }
@@ -121,13 +103,11 @@ function generateCreateTableSQL(tableName: string, data: DataItem[]): string {
   // Form the SQL statement
   let sql;
   if (fk_array.length !== 0) {
-    sql = `CREATE TABLE IF NOT EXISTS ${quoteColumn(
-      tableName
-    )} (${columnDefinitions} ${"," + fk_array.join(",")});`;
+    sql = `CREATE TABLE IF NOT EXISTS ${q(tableName)} (${columnDefinitions} ${
+      "," + fk_array.join(",")
+    });`;
   } else {
-    sql = `CREATE TABLE IF NOT EXISTS ${quoteColumn(
-      tableName
-    )} (${columnDefinitions});`;
+    sql = `CREATE TABLE IF NOT EXISTS ${q(tableName)} (${columnDefinitions});`;
   }
 
   return sql;

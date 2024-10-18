@@ -2,6 +2,7 @@ import * as sqlite3 from "sqlite3"; // Assuming you're using sqlite3
 import logger from "./logger"; // Assuming logger is imported from a separate file
 import * as fs from "fs";
 import * as path from "path";
+import { quoteColumn as q } from "./helpers";
 
 // Interface for a Query object (optional for improved type safety)
 interface Query {
@@ -152,7 +153,7 @@ function fetchTable(
   table: string
 ): Promise<{ bool: boolean; data?: any[] }> {
   return new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM ${table}`, function (error, rows) {
+    db.all(`SELECT * FROM ${q(table)}`, function (error, rows) {
       if (error) {
         logger.error("Error while fetching table");
         logger.error(error.message);
@@ -173,7 +174,7 @@ function fetchRecord(
 ): Promise<{ bool: boolean; data?: any[] }> {
   return new Promise((resolve, reject) => {
     db.all(
-      `SELECT * FROM ${table} WHERE ${label} = ${id}`,
+      `SELECT * FROM ${q(table)} WHERE ${label} = ${id}`,
       function (error, rows: any) {
         if (error) {
           logger.error("Error while fetching record");
@@ -193,7 +194,7 @@ function fetchTableInfo(
   table: string
 ): Promise<{ bool: boolean; data?: ColumnInfo[] }> {
   return new Promise((resolve, reject) => {
-    db.all(`PRAGMA table_info(${table})`, function (error, rows: any) {
+    db.all(`PRAGMA table_info(${q(table)})`, function (error, rows: any) {
       if (error) {
         logger.error("Error while fetching table info");
         logger.error(error.message);
@@ -232,7 +233,7 @@ function fetchAllTableInfo(
   table: string
 ): Promise<{ bool: boolean; data?: ColumnInfo[] }> {
   return new Promise((resolve, reject) => {
-    db.all(`PRAGMA table_info(${table})`, function (error, rows: any) {
+    db.all(`PRAGMA table_info(${q(table)})`, function (error, rows: any) {
       if (error) {
         logger.error("Error while fetching table info");
         logger.error(error.message);
@@ -263,7 +264,7 @@ async function fetchTableForeignKeys(
   table: string
 ): Promise<FetchTableForeignKeysResult> {
   return new Promise((resolve, reject) => {
-    db.all(`PRAGMA foreign_key_list(${table})`, function (error, rows: any) {
+    db.all(`PRAGMA foreign_key_list(${q(table)})`, function (error, rows: any) {
       if (error) {
         console.error("Error while fetching foreign key info");
         console.error(error.message);
@@ -291,7 +292,7 @@ function fetchFK(
   column: string
 ): Promise<{ bool: boolean; data: any[] }> {
   return new Promise((resolve, reject) => {
-    db.all(`SELECT ${column} from ${table}`, function (error, rows) {
+    db.all(`SELECT ${q(column)} from ${q(table)}`, function (error, rows) {
       if (error) {
         logger.error("Error while fetching Foreign keys");
         logger.error(error.message);
@@ -352,7 +353,7 @@ function checkColumnHasDefault(
       const sql = `
                 SELECT sql
                 FROM sqlite_master
-                WHERE type = 'table' AND name = '${tableName}'
+                WHERE type = 'table' AND name = '${q(tableName)}'
             `;
 
       // Execute the SQL query
@@ -372,7 +373,7 @@ function checkColumnHasDefault(
         }
         // Check if the SQL definition contains the column name and the word "DEFAULT"
         const hasDefault = row.sql.includes(
-          `${columnName} ${columnType} DEFAULT`
+          `${q(columnName)} ${columnType} DEFAULT`
         );
 
         // Return the result
@@ -436,11 +437,11 @@ function exportDatabaseToSQL(
             const tableName = table.name;
             const createTableSQL = table.sql;
 
-            sql += `-- Dumping data for table ${tableName}\n`;
+            sql += `-- Dumping data for table ${q(tableName)}\n`;
             sql += `${createTableSQL};\n`;
 
             db.all(
-              `PRAGMA table_info(${tableName})`,
+              `PRAGMA table_info(${q(tableName)})`,
               (err, columns: Column[]) => {
                 if (err) {
                   reject({ bool: false, error: err.message });
@@ -451,18 +452,20 @@ function exportDatabaseToSQL(
                   sql += `-- ${column.cid} | ${column.name} | ${column.type} | ${column.notnull} | ${column.dflt_value} | ${column.pk}\n`;
                 });
 
-                db.all(`SELECT * FROM ${tableName}`, (err, rows: Row[]) => {
+                db.all(`SELECT * FROM ${q(tableName)}`, (err, rows: Row[]) => {
                   if (err) {
                     reject({ bool: false, error: err.message });
                     return;
                   }
 
                   rows.forEach((row) => {
-                    const columns = Object.keys(row).join(", ");
+                    const columns = Object.keys(row).map(q).join(", ");
                     const values = Object.values(row)
                       .map((value) => `'${value}'`)
                       .join(", ");
-                    sql += `INSERT INTO ${tableName} (${columns}) VALUES (${values});\n`;
+                    sql += `INSERT INTO ${q(
+                      tableName
+                    )} (${columns}) VALUES (${values});\n`;
                   });
 
                   pendingTables -= 1;
