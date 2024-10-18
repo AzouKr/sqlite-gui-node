@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const databaseFunctions_1 = __importDefault(require("./databaseFunctions"));
+const shouldEscapeValue = (item) => item.type === "text" || item.type === "blob" || item.type.match(/^varchar/i);
 function generateInsertSQL(db, tableName, data) {
     return __awaiter(this, void 0, void 0, function* () {
         // Extract field names and escape values (optional for TEXT and BLOB)
@@ -24,8 +25,7 @@ function generateInsertSQL(db, tableName, data) {
                 if (!hasDefault.bool) {
                     // doesn't have default value
                     columns.push(item.field);
-                    if (item.type.toUpperCase() === "TEXT" ||
-                        item.type.toUpperCase() === "BLOB") {
+                    if (shouldEscapeValue(item)) {
                         values.push(item.value !== ""
                             ? `'${String(item.value).replace(/'/g, "''")}'`
                             : "NULL" // Escape single quotes or use NULL
@@ -39,8 +39,7 @@ function generateInsertSQL(db, tableName, data) {
             else {
                 // doesn't have default value
                 columns.push(item.field);
-                if (item.type.toUpperCase() === "TEXT" ||
-                    item.type.toUpperCase() === "BLOB") {
+                if (shouldEscapeValue(item)) {
                     values.push(item.value !== ""
                         ? `'${String(item.value).replace(/'/g, "''")}'`
                         : "NULL" // Escape single quotes or use NULL
@@ -66,7 +65,7 @@ function generateUpdateSQL(tableName, data, id, id_label) {
             item.value === undefined) {
             value = "NULL";
         }
-        else if (item.type === "TEXT") {
+        else if (shouldEscapeValue(item)) {
             value = `'${String(item.value).replace(/'/g, "''")}'`; // Escape single quotes
         }
         else {
