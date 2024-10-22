@@ -4,7 +4,7 @@ import path from "path";
 import databaseFunctions from "./Utils/databaseFunctions";
 import logger from "./Utils/logger";
 import tableRoutes from "./routes/tables";
-import * as sqlite3 from "sqlite3"; // Assuming you're using sqlite3
+import type { Database } from "sqlite3";
 
 const app = express();
 
@@ -40,7 +40,7 @@ app.get("/edit/:table/:label/:id", (req, res) => {
 });
 
 // SqliteGuiNode function to run the app
-async function SqliteGuiNode(db: sqlite3.Database, port = 8080) {
+export async function SqliteGuiNode(db: Database, port = 8080) {
   await databaseFunctions.InitializeDB(db);
   app.use("/api/tables", tableRoutes(db));
   app.listen(port, () => {
@@ -51,7 +51,7 @@ async function SqliteGuiNode(db: sqlite3.Database, port = 8080) {
 }
 
 // SqliteGuiNode as middleware
-function SqliteGuiNodeMiddleware(app: any, db: sqlite3.Database) {
+export function SqliteGuiNodeMiddleware(app: any, db: Database) {
   return async function (req: Request, res: Response, next: NextFunction) {
     try {
       await databaseFunctions.InitializeDB(db);
@@ -98,9 +98,3 @@ function SqliteGuiNodeMiddleware(app: any, db: sqlite3.Database) {
     }
   };
 }
-
-// Export both SqliteGuiNode and SqliteGuiNodeMiddleware
-module.exports = {
-  SqliteGuiNode,
-  SqliteGuiNodeMiddleware,
-};

@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SqliteGuiNodeMiddleware = exports.SqliteGuiNode = void 0;
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const path_1 = __importDefault(require("path"));
@@ -53,6 +54,7 @@ function SqliteGuiNode(db_1) {
         });
     });
 }
+exports.SqliteGuiNode = SqliteGuiNode;
 // SqliteGuiNode as middleware
 function SqliteGuiNodeMiddleware(app, db) {
     return function (req, res, next) {
@@ -97,8 +99,4 @@ function SqliteGuiNodeMiddleware(app, db) {
         });
     };
 }
-// Export both SqliteGuiNode and SqliteGuiNodeMiddleware
-module.exports = {
-    SqliteGuiNode,
-    SqliteGuiNodeMiddleware,
-};
+exports.SqliteGuiNodeMiddleware = SqliteGuiNodeMiddleware;
