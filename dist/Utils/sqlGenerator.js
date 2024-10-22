@@ -76,8 +76,13 @@ function generateCreateTableSQL(tableName, data) {
     })
         .join(", ");
     // Form the SQL statement
-    const fkExtra = fk_array.length ? `${"," + fk_array.join(",")}` : "";
-    const sql = `CREATE TABLE IF NOT EXISTS ${(0, helpers_1.quoteColumn)(tableName)} (${columnDefinitions} ${fkExtra});`;
+    let sql;
+    if (fk_array.length !== 0) {
+        sql = `CREATE TABLE IF NOT EXISTS ${(0, helpers_1.quoteColumn)(tableName)} (${columnDefinitions} ${"," + fk_array.join(",")});`;
+    }
+    else {
+        sql = `CREATE TABLE IF NOT EXISTS ${(0, helpers_1.quoteColumn)(tableName)} (${columnDefinitions});`;
+    }
     return sql;
 }
 exports.default = {

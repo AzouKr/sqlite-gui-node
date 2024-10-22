@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const databaseFunctions_1 = __importDefault(require("../Utils/databaseFunctions"));
 const sqlGenerator_1 = __importDefault(require("../Utils/sqlGenerator"));
+const helpers_1 = require("../Utils/helpers");
 const router = express_1.default.Router();
 function tableRoutes(db) {
     router.get("/", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -225,7 +226,7 @@ function tableRoutes(db) {
     router.post("/table/delete", (req, res) => __awaiter(this, void 0, void 0, function* () {
         try {
             const { tablename } = req.body;
-            const sql = `DROP TABLE ${tablename};`;
+            const sql = `DROP TABLE ${(0, helpers_1.quoteColumn)(tablename)};`;
             const response = yield databaseFunctions_1.default.runQuery(db, sql);
             res.status(200).json(response);
         }
