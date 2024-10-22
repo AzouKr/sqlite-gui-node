@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import databaseFunctions from "../Utils/databaseFunctions";
 import * as sqlite3 from "sqlite3"; // Assuming you're using sqlite3
 import sqlGenerator from "../Utils/sqlGenerator";
+import { quoteColumn as q } from "../Utils/helpers";
 
 const router = express.Router();
 
@@ -123,10 +124,7 @@ function tableRoutes(db: sqlite3.Database) {
       const { sqlQuery } = req.body;
       const lowersqlQuery = sqlQuery.toLowerCase();
       if (lowersqlQuery.startsWith("select")) {
-        const response = await databaseFunctions.runSelectQuery(
-          db,
-          sqlQuery
-        );
+        const response = await databaseFunctions.runSelectQuery(db, sqlQuery);
         if (lowersqlQuery.startsWith("select count(*)")) {
           if (response.data !== undefined) {
             res.status(200).json({
@@ -247,7 +245,7 @@ function tableRoutes(db: sqlite3.Database) {
   router.post("/table/delete", async (req: Request, res: Response) => {
     try {
       const { tablename } = req.body;
-      const sql = `DROP TABLE ${tablename};`;
+      const sql = `DROP TABLE ${q(tablename)};`;
       const response = await databaseFunctions.runQuery(db, sql);
       res.status(200).json(response);
     } catch (error) {
