@@ -1,12 +1,12 @@
 import express, { Request, Response } from "express";
 import databaseFunctions from "../Utils/databaseFunctions";
-import * as sqlite3 from "sqlite3"; // Assuming you're using sqlite3
 import sqlGenerator from "../Utils/sqlGenerator";
 import { quoteColumn as q } from "../Utils/helpers";
+import type { Database } from "sqlite3";
 
 const router = express.Router();
 
-function tableRoutes(db: sqlite3.Database) {
+function tableRoutes(db: Database) {
   router.get("/", async (req: Request, res: Response) => {
     try {
       await databaseFunctions.exportDatabaseToSQL(db);

@@ -1,8 +1,9 @@
-import * as sqlite3 from "sqlite3"; // Assuming you're using sqlite3
 import logger from "./logger"; // Assuming logger is imported from a separate file
 import * as fs from "fs";
 import * as path from "path";
 import { quoteColumn as q } from "./helpers";
+
+import type { Database } from "sqlite3";
 
 // Interface for a Query object (optional for improved type safety)
 interface Query {
@@ -50,7 +51,7 @@ interface Row {
   [key: string]: any;
 }
 
-async function InitializeDB(db: sqlite3.Database): Promise<void> {
+async function InitializeDB(db: Database): Promise<void> {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       db.get(
@@ -89,7 +90,7 @@ async function InitializeDB(db: sqlite3.Database): Promise<void> {
 }
 
 function insertQuery(
-  db: sqlite3.Database,
+  db: Database,
   name: string,
   sqlStatement: string
 ): Promise<{ bool: boolean; error?: string }> {
@@ -112,7 +113,7 @@ function insertQuery(
 }
 
 function fetchQueries(
-  db: sqlite3.Database
+  db: Database
 ): Promise<{ bool: boolean; data?: Query[] }> {
   return new Promise((resolve, reject) => {
     db.all(`SELECT * FROM query`, function (error, rows: any) {
@@ -129,7 +130,7 @@ function fetchQueries(
 }
 
 function fetchAllTables(
-  db: sqlite3.Database
+  db: Database
 ): Promise<{ bool: boolean; data?: string[] }> {
   return new Promise((resolve, reject) => {
     db.all(
@@ -149,7 +150,7 @@ function fetchAllTables(
 }
 
 function fetchTable(
-  db: sqlite3.Database,
+  db: Database,
   table: string
 ): Promise<{ bool: boolean; data?: any[] }> {
   return new Promise((resolve, reject) => {
@@ -167,7 +168,7 @@ function fetchTable(
 }
 
 function fetchRecord(
-  db: sqlite3.Database,
+  db: Database,
   table: string,
   label: string,
   id: number
@@ -190,7 +191,7 @@ function fetchRecord(
 }
 
 function fetchTableInfo(
-  db: sqlite3.Database,
+  db: Database,
   table: string
 ): Promise<{ bool: boolean; data?: ColumnInfo[] }> {
   return new Promise((resolve, reject) => {
@@ -229,7 +230,7 @@ function fetchTableInfo(
 }
 
 function fetchAllTableInfo(
-  db: sqlite3.Database,
+  db: Database,
   table: string
 ): Promise<{ bool: boolean; data?: ColumnInfo[] }> {
   return new Promise((resolve, reject) => {
@@ -260,7 +261,7 @@ function fetchAllTableInfo(
 
 // Function to fetch foreign key info of a table
 async function fetchTableForeignKeys(
-  db: sqlite3.Database,
+  db: Database,
   table: string
 ): Promise<FetchTableForeignKeysResult> {
   return new Promise((resolve, reject) => {
@@ -287,7 +288,7 @@ async function fetchTableForeignKeys(
 }
 
 function fetchFK(
-  db: sqlite3.Database,
+  db: Database,
   table: string,
   column: string
 ): Promise<{ bool: boolean; data: any[] }> {
@@ -306,7 +307,7 @@ function fetchFK(
 }
 
 function runQuery(
-  db: sqlite3.Database,
+  db: Database,
   sqlStatement: string
 ): Promise<{ bool: boolean; error?: string }> {
   return new Promise((resolve, reject) => {
@@ -324,7 +325,7 @@ function runQuery(
 }
 
 function runSelectQuery(
-  db: sqlite3.Database,
+  db: Database,
   sqlStatement: string
 ): Promise<{ bool: boolean; data?: any[] }> {
   return new Promise((resolve, reject) => {
@@ -342,7 +343,7 @@ function runSelectQuery(
 }
 
 function checkColumnHasDefault(
-  db: sqlite3.Database,
+  db: Database,
   tableName: string,
   columnType: string,
   columnName: string
@@ -390,7 +391,7 @@ function checkColumnHasDefault(
 }
 
 function deleteFromTable(
-  db: sqlite3.Database,
+  db: Database,
   name: string,
   id: number
 ): Promise<{ bool: boolean; error?: string }> {
@@ -410,7 +411,7 @@ function deleteFromTable(
 }
 
 function exportDatabaseToSQL(
-  db: sqlite3.Database
+  db: Database
 ): Promise<{ bool: boolean; filePath?: string; error?: string }> {
   return new Promise((resolve, reject) => {
     const outputPath = path.resolve(
