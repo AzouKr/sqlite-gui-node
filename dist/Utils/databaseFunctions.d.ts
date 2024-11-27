@@ -36,7 +36,7 @@ declare function fetchTable(db: Database, table: string): Promise<{
     bool: boolean;
     data?: any[];
 }>;
-declare function fetchRecord(db: Database, table: string, label: string, id: number): Promise<{
+declare function fetchRecord(db: Database, table: string, label: string, id: number | string): Promise<{
     bool: boolean;
     data?: any[];
 }>;

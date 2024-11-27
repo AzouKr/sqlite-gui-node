@@ -47,9 +47,9 @@ function generateUpdateSQL(
     .join(", ");
 
   // Form the SQL statement
-  const sql = `UPDATE ${q(
-    tableName
-  )} SET ${setClauses} WHERE ${id_label} = ${id};`;
+  const sql = `UPDATE ${q(tableName)} SET ${setClauses} WHERE ${id_label} = ${
+    typeof id === "string" ? `'${id}'` : id
+  };`;
 
   return sql;
 }

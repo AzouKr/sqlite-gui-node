@@ -70,7 +70,7 @@ async function createForm() {
 
   const selectElement = document.getElementById("input-pk");
   selectElement.addEventListener("change", (event) => {
-    if (event.target.value === "PRIMARY KEY AUTOINCREMENT") {
+    if (event.target.value === "PRIMARY KEY") {
       default_div.style.display = "none";
       fk_div.style.display = "none";
     } else {
@@ -132,7 +132,7 @@ async function createForm() {
       alert("Please enter the name of the field");
       return;
     }
-    if (inputPk === "PRIMARY KEY AUTOINCREMENT") {
+    if (inputPk === "PRIMARY KEY") {
       if (pk_count === 2) {
         alert("A table must have a maximum one primary key");
         return;
@@ -227,7 +227,7 @@ async function createForm() {
       return {
         name: cells[0].innerText,
         type: cells[1].innerText,
-        pk: cells[2].innerText === "YES" ? "PRIMARY KEY AUTOINCREMENT" : "",
+        pk: cells[2].innerText === "YES" ? "PRIMARY KEY" : "",
         fk: cells[4].innerText,
         default: defaultValue,
       };
@@ -282,7 +282,7 @@ async function createForm() {
       return {
         name: cells[0].innerText,
         type: cells[1].innerText,
-        pk: cells[2].innerText === "YES" ? "PRIMARY KEY AUTOINCREMENT" : "",
+        pk: cells[2].innerText === "YES" ? "PRIMARY KEY" : "",
         fk: cells[4].innerText,
         default: defaultValue,
       };

@@ -171,11 +171,13 @@ function fetchRecord(
   db: Database,
   table: string,
   label: string,
-  id: number
+  id: number | string
 ): Promise<{ bool: boolean; data?: any[] }> {
   return new Promise((resolve, reject) => {
     db.all(
-      `SELECT * FROM ${q(table)} WHERE ${label} = ${id}`,
+      `SELECT * FROM ${q(table)} WHERE ${label} = ${
+        typeof id === "string" ? `'${id}'` : id
+      }`,
       function (error, rows: any) {
         if (error) {
           logger.error("Error while fetching record");
@@ -202,16 +204,16 @@ function fetchTableInfo(
         reject({ bool: false, error: error.message });
       } else {
         // Filter out the auto-increment column
-        const filteredColumns = rows.filter(
-          (row: any) =>
-            !(
-              (row.pk > 0 && row.type.toUpperCase() === "INTEGER") ||
-              row.type.toUpperCase() === "DATETIME"
-            )
-        );
+        // const filteredColumns = rows.filter(
+        //   (row: any) =>
+        //     !(
+        //       (row.pk > 0 && row.type.toUpperCase() === "INTEGER") ||
+        //       row.type.toUpperCase() === "DATETIME"
+        //     )
+        // );
 
         // Map the remaining columns to an array of column objects with name and type
-        const tableInfo = filteredColumns.map((row: any) => ({
+        const tableInfo = rows.map((row: any) => ({
           field: row.name,
           type: row.type,
         }));

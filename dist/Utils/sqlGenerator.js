@@ -37,7 +37,7 @@ function generateUpdateSQL(tableName, data, id, id_label) {
         .map((item) => `${(0, helpers_1.quoteColumn)(item.field)} = ${(0, helpers_1.quoteValue)(item)}`)
         .join(", ");
     // Form the SQL statement
-    const sql = `UPDATE ${(0, helpers_1.quoteColumn)(tableName)} SET ${setClauses} WHERE ${id_label} = ${id};`;
+    const sql = `UPDATE ${(0, helpers_1.quoteColumn)(tableName)} SET ${setClauses} WHERE ${id_label} = ${typeof id === "string" ? `'${id}'` : id};`;
     return sql;
 }
 function generateCreateTableSQL(tableName, data) {

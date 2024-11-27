@@ -206,7 +206,7 @@ function tableRoutes(db) {
     router.get("/getrecord/:tablename/:label/:id", (req, res) => __awaiter(this, void 0, void 0, function* () {
         try {
             const { tablename, label, id } = req.params;
-            const response = yield databaseFunctions_1.default.fetchRecord(db, tablename, label, Number(id));
+            const response = yield databaseFunctions_1.default.fetchRecord(db, tablename, label, id);
             res.status(200).json(response);
         }
         catch (error) {

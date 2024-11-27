@@ -219,7 +219,7 @@ function tableRoutes(db: Database) {
           db,
           tablename,
           label,
-          Number(id)
+          id
         );
         res.status(200).json(response);
       } catch (error) {
