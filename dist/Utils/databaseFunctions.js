@@ -323,7 +323,7 @@ function checkColumnHasDefault(db, tableName, columnType, columnName) {
 function deleteFromTable(db, name, id) {
     // console.log(sqlStatement);
     return new Promise((resolve, reject) => {
-        db.run(`DELETE FROM ${name} WHERE id = ${id};`, function (error) {
+        db.run(`DELETE FROM ${name} WHERE id = ${typeof id === "string" ? `'${id}'` : id};`, function (error) {
             if (error) {
                 logger_1.default.error("Error while deleting");
                 logger_1.default.error(error.message);

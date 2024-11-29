@@ -6,8 +6,7 @@ export const isEmpty = (value: string | number | null | undefined) =>
 
 export const quoteValue = (item: DataItem): string => {
   const shouldQuote =
-    item.type.toLocaleLowerCase() === "text" ||
-    item.type.toLocaleLowerCase() === "blob" ||
+    ["text", "blob", "datetime"].includes(item.type.toLocaleLowerCase()) ||
     item.type.match(/^varchar/i);
 
   if (isEmpty(item.value)) return "NULL";

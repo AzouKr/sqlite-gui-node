@@ -38,14 +38,13 @@ async function generateInsertSQL(
 function generateUpdateSQL(
   tableName: string,
   data: DataItem[],
-  id: number,
+  id: number | string,
   id_label: string
 ): string {
   // Extract field names and values with proper handling
   const setClauses = data
     .map((item) => `${q(item.field)} = ${quoteValue(item)}`)
     .join(", ");
-
   // Form the SQL statement
   const sql = `UPDATE ${q(tableName)} SET ${setClauses} WHERE ${id_label} = ${
     typeof id === "string" ? `'${id}'` : id

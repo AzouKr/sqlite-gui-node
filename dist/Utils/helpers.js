@@ -5,8 +5,7 @@ exports.quoteColumn = exports.quoteValue = exports.isEmpty = void 0;
 const isEmpty = (value) => !value && value !== 0;
 exports.isEmpty = isEmpty;
 const quoteValue = (item) => {
-    const shouldQuote = item.type.toLocaleLowerCase() === "text" ||
-        item.type.toLocaleLowerCase() === "blob" ||
+    const shouldQuote = ["text", "blob", "datetime"].includes(item.type.toLocaleLowerCase()) ||
         item.type.match(/^varchar/i);
     if ((0, exports.isEmpty)(item.value))
         return "NULL";

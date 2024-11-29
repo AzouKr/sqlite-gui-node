@@ -66,7 +66,7 @@ declare function checkColumnHasDefault(db: Database, tableName: string, columnTy
     message?: string;
     error?: string;
 }>;
-declare function deleteFromTable(db: Database, name: string, id: number): Promise<{
+declare function deleteFromTable(db: Database, name: string, id: number | string): Promise<{
     bool: boolean;
     error?: string;
 }>;

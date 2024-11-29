@@ -395,20 +395,25 @@ function checkColumnHasDefault(
 function deleteFromTable(
   db: Database,
   name: string,
-  id: number
+  id: number | string
 ): Promise<{ bool: boolean; error?: string }> {
   // console.log(sqlStatement);
   return new Promise((resolve, reject) => {
-    db.run(`DELETE FROM ${name} WHERE id = ${id};`, function (error) {
-      if (error) {
-        logger.error("Error while deleting");
-        logger.error(error.message);
-        reject({ bool: false, error: error.message });
-        return;
-      } else {
-        resolve({ bool: true });
+    db.run(
+      `DELETE FROM ${name} WHERE id = ${
+        typeof id === "string" ? `'${id}'` : id
+      };`,
+      function (error) {
+        if (error) {
+          logger.error("Error while deleting");
+          logger.error(error.message);
+          reject({ bool: false, error: error.message });
+          return;
+        } else {
+          resolve({ bool: true });
+        }
       }
-    });
+    );
   });
 }
 
