@@ -76,13 +76,10 @@ function tableRoutes(db) {
                                 }
                             });
                         }
-                        res.status(200).json(response);
                     });
                 });
             }
-            else {
-                res.status(200).json(response);
-            }
+            res.status(200).json(response);
         }
         catch (error) {
             res.status(500).json({ message: "Internal server error" });
