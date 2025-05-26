@@ -127,6 +127,10 @@
   text-align: left;
 }
 
+.table tr {
+  height: 45px;
+}
+
 .main_body_header {
   height: 5vh;
   width: 100%;
