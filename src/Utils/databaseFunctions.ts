@@ -149,22 +149,56 @@ function fetchAllTables(
   });
 }
 
-function fetchTable(
+async function fetchTable(
   db: Database,
-  table: string
-): Promise<{ bool: boolean; data?: any[] }> {
-  return new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM ${q(table)}`, function (error, rows) {
-      if (error) {
-        logger.error("Error while fetching table");
-        logger.error(error.message);
-        reject({ bool: false, error: error.message });
-        return;
-      } else {
-        resolve({ bool: true, data: rows });
-      }
-    });
-  });
+  table: string,
+  pagination = { page: 1, perPage: 50 }
+): Promise<{ bool: boolean; data?: any[], meta: any }> {
+  const page = pagination.page;
+  const limit = pagination.perPage;
+  const offset = (page - 1) * limit;
+  console.log("🚀 ~ fetchTable ~ offset:", { offset, limit , page})
+  
+  const [rows, total] = await Promise.all([
+    new Promise<any[]>((resolve, reject) => {
+      db.all(`SELECT * FROM ${q(table)} LIMIT ${limit} OFFSET ${offset}`, function (error, rows) {
+        if (error) {
+          logger.error("Error while fetching table");
+          logger.error(error.message);
+          reject({ bool: false, error: error.message });
+
+          return;
+        } else {
+          resolve(rows);
+        }
+      });
+    }),
+    new Promise((resolve, reject) => {
+      db.get(`SELECT COUNT(*) FROM ${q(table)};`, function(error, res: Record<string, number>) {
+        if (error) {
+          logger.error("Error while fetching table");
+          logger.error(error.message);
+          reject({ bool: false, error: error.message });
+
+          return;
+        } else {
+          resolve(Object.values(res)[0] ?? 0);
+        }
+      })
+    }),
+  ]);
+
+  return {
+    bool: true, 
+    data: rows || [], 
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(Number(total) / limit)
+    }
+  }
+
 }
 
 function fetchRecord(

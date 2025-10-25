@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function fetchTableInfos(tableName) {
   try {
-    const response = await fetch(`/api/tables/infos/${tableName}`); // Correct endpoint
+    const response = await fetch(`${window.BASE_URL}/api/tables/infos/${tableName}`); // Correct endpoint
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -114,7 +114,7 @@ function displayTableData(fields) {
     });
 
     try {
-      const response = await fetch("/api/tables/insert", {
+      const response = await fetch(`${window.BASE_URL}/api/tables/insert`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -154,7 +154,7 @@ function displayTableData(fields) {
     });
 
     try {
-      const response = await fetch("/api/tables/generate/insert", {
+      const response = await fetch(`${window.BASE_URL}/api/tables/generate/insert`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

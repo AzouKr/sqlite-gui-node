@@ -51,8 +51,9 @@ function tableRoutes(db) {
     }));
     router.get("/:name", (req, res) => __awaiter(this, void 0, void 0, function* () {
         const { name } = req.params;
+        const { page, perPage } = req.query;
         try {
-            const response = yield databaseFunctions_1.default.fetchTable(db, name);
+            const response = yield databaseFunctions_1.default.fetchTable(db, name, { page: Number(page), perPage: Number(perPage) });
             res.status(200).json(response);
         }
         catch (error) {
