@@ -133,7 +133,6 @@ function fetchTable(db_1, table_1) {
         const page = pagination.page;
         const limit = pagination.perPage;
         const offset = (page - 1) * limit;
-        console.log("🚀 ~ fetchTable ~ offset:", { offset, limit, page });
         const [rows, total] = yield Promise.all([
             new Promise((resolve, reject) => {
                 db.all(`SELECT * FROM ${(0, helpers_1.quoteColumn)(table)} LIMIT ${limit} OFFSET ${offset}`, function (error, rows) {

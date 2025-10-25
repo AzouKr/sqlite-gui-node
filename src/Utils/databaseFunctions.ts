@@ -157,7 +157,6 @@ async function fetchTable(
   const page = pagination.page;
   const limit = pagination.perPage;
   const offset = (page - 1) * limit;
-  console.log("🚀 ~ fetchTable ~ offset:", { offset, limit , page})
   
   const [rows, total] = await Promise.all([
     new Promise<any[]>((resolve, reject) => {
