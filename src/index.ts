@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction, type Application } from "express";
 import bodyParser from "body-parser";
 import path from "path";
 import databaseFunctions from "./Utils/databaseFunctions";
@@ -55,7 +55,7 @@ export async function SqliteGuiNode(db: Database, port = 8080) {
   });
 }
 
-export async function createSqliteGuiApp(db: Database) {
+export async function createSqliteGuiApp(db: Database): Promise<Application> {
   await databaseFunctions.InitializeDB(db);
   app.use("/api/tables", tableRoutes(db));
 
