@@ -2,7 +2,7 @@ let pk_count = 1;
 
 async function fetchData() {
   try {
-    const response = await fetch("/api/tables");
+    const response = await fetch(`${window.BASE_URL}/api/tables`);
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -30,7 +30,7 @@ async function fetchData() {
 
 async function fetchTableInfos(tableName) {
   try {
-    const response = await fetch(`/api/tables/all/infos/${tableName}`); // Correct endpoint
+    const response = await fetch(`${window.BASE_URL}/api/tables/all/infos/${tableName}`); // Correct endpoint
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -233,7 +233,7 @@ async function createForm() {
       };
     });
 
-    fetch("/api/tables/create", {
+    fetch(`${window.BASE_URL}/api/tables/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -245,7 +245,7 @@ async function createForm() {
           throw new Error("Network response was not ok");
         }
         // Handle response if needed
-        window.location.href = `/home`;
+        window.location.href = `${window.BASE_URL}/home`;
       })
       .catch((error) => {
         console.error("Error creating table:", error);
@@ -289,7 +289,7 @@ async function createForm() {
     });
 
     try {
-      await fetch("/api/tables/generate/create", {
+      await fetch(`${window.BASE_URL}/api/tables/generate/create`${window.BASE_URL}, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

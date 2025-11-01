@@ -12,7 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SqliteGuiNodeMiddleware = exports.SqliteGuiNode = void 0;
+exports.SqliteGuiNode = SqliteGuiNode;
+exports.createSqliteGuiApp = createSqliteGuiApp;
+exports.SqliteGuiNodeMiddleware = SqliteGuiNodeMiddleware;
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const path_1 = __importDefault(require("path"));
@@ -25,6 +27,10 @@ app.set("views", path_1.default.join(__dirname, "../views"));
 app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use(express_1.default.static(path_1.default.join(__dirname, "../public")));
 app.use(body_parser_1.default.json());
+app.use((req, res, next) => {
+    res.locals.basePath = req.baseUrl;
+    next();
+});
 // Routes
 app.get("/query", (req, res) => {
     res.render("query", { title: "Query Page" });
@@ -54,7 +60,13 @@ function SqliteGuiNode(db_1) {
         });
     });
 }
-exports.SqliteGuiNode = SqliteGuiNode;
+function createSqliteGuiApp(db) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield databaseFunctions_1.default.InitializeDB(db);
+        app.use("/api/tables", (0, tables_1.default)(db));
+        return app;
+    });
+}
 // SqliteGuiNode as middleware
 function SqliteGuiNodeMiddleware(app, db) {
     return function (req, res, next) {
@@ -99,4 +111,3 @@ function SqliteGuiNodeMiddleware(app, db) {
         });
     };
 }
-exports.SqliteGuiNodeMiddleware = SqliteGuiNodeMiddleware;

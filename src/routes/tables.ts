@@ -44,8 +44,10 @@ function tableRoutes(db: Database) {
 
   router.get("/:name", async (req: Request, res: Response) => {
     const { name } = req.params;
+    const {page, perPage} = req.query;
+    
     try {
-      const response = await databaseFunctions.fetchTable(db, name);
+      const response = await databaseFunctions.fetchTable(db, name, { page: Number(page), perPage: Number(perPage) });
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });

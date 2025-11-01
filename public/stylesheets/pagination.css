@@ -1,0 +1,94 @@
+.pagination-wrapper {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    margin: 20px auto;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pagination button {
+    min-width: 40px;
+    height: 40px;
+    border: 2px solid var(--bs-gray-500);
+    background: white;
+    color: var(--bs-gray-dark);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+}
+
+.pagination button:hover:not(:disabled) {
+    border-color: var(--bs-blue);
+    color: var(--bs-blue);
+    transform: translateY(-2px);
+}
+
+.pagination button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.pagination button.active {
+    background: var(--bs-blue);
+    color: white;
+    border-color: var(--bs-blue);
+}
+
+.pagination button.active:hover {
+    color: white;
+}
+
+.pagination .dots {
+    color: var(--bs-gray-500);
+    font-weight: bold;
+    padding: 0 5px;
+    user-select: none;
+}
+
+.per-page-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--bs-gray-500);
+}
+
+.per-page-selector select {
+    padding: 8px 32px 8px 12px;
+    border: 2px solid var(--bs-gray-500);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--bs-gray-dark);
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+.per-page-selector select:hover {
+    border-color: var(--bs-blue);
+}
+
+.per-page-selector select:focus {
+    outline: none;
+    border-color: var(--bs-blue);
+}

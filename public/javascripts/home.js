@@ -2,7 +2,7 @@ let tablename;
 
 async function fetchData() {
   try {
-    const response = await fetch("/api/tables");
+    const response = await fetch(`${window.BASE_URL}/api/tables`);
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -43,15 +43,26 @@ function populateSidebar(tables) {
   });
 }
 
-async function fetchTableData(tableName) {
+async function fetchTableData(tableName, paginationParams = {page: 1, perPage: 50}) {
   try {
-    const response = await fetch(`/api/tables/${tableName}`);
+    const response = await fetch(`${window.BASE_URL}/api/tables/${tableName}?page=${paginationParams.page}&perPage=${paginationParams.perPage}`);
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
     if (data.bool) {
       displayTableData(data.data);
+
+      const pagination = new Pagination({
+        element: document.getElementById('pagination_container'),
+        perPageOptions: [10, 20, 50, 100],
+        defaultPerPage: paginationParams.perPage,        
+        currentPage: data.meta.page,
+        onChange: ({ currentPage, itemsPerPage }) => {
+          fetchTableData(tablename, { page: currentPage, perPage: itemsPerPage });
+        }
+      });
+      pagination.setTotalItems(data.meta.total);
     } else {
       console.error("Error fetching table data:", data.error);
     }
@@ -70,7 +81,7 @@ function displayTableData(data) {
   insertButton.textContent = "Insert";
   insertButton.classList.add("insert_btn");
   insertButton.onclick = () => {
-    window.location.href = `/insert/${tablename}`;
+    window.location.href = `${window.BASE_URL}/insert/${tablename}`;
   };
   headerDiv.appendChild(insertButton);
 
@@ -79,7 +90,7 @@ function displayTableData(data) {
   deleteButton.classList.add("delete_btn");
   deleteButton.onclick = () => {
     if (window.confirm("Are you sure you want to delete this table")) {
-      fetch("/api/tables/table/delete", {
+      fetch(`${window.BASE_URL}/api/tables/table/delete`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -186,7 +197,7 @@ function displayTableData(data) {
       editIcon.classList.add("action-icon");
       editIcon.style.height = "2vh";
       editIcon.onclick = () => {
-        window.location.href = `/edit/${tablename}/${id_name}/${row[id_name]}`;
+        window.location.href = `${window.BASE_URL}/edit/${tablename}/${id_name}/${row[id_name]}`;
       };
       editTd.appendChild(editIcon);
       fixedTr.appendChild(editTd);
@@ -198,7 +209,7 @@ function displayTableData(data) {
       deleteIcon.style.height = "2vh";
       deleteIcon.onclick = () => {
         if (window.confirm("Are you sure you want to delete this row")) {
-          fetch("/api/tables/delete", {
+          fetch(`${window.BASE_URL}/api/tables/delete`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -241,26 +252,31 @@ function displayTableData(data) {
 }
 
 document.addEventListener("DOMContentLoaded", fetchData);
-
-document.getElementById("add-input").addEventListener("click", function () {
-  const container = document.getElementById("input-container");
-  const inputDiv = document.createElement("div");
-  inputDiv.classList.add("input-container");
-
-  const inputType = document.getElementById("input-type").value;
-  const input = document.createElement("input");
-  input.type = inputType;
-  input.placeholder = "Type here";
-  input.classList.add("input", "input-bordered", "w-full", "m-2");
-
-  inputDiv.appendChild(input);
-  container.appendChild(inputDiv);
-});
-
-document.getElementById("get-values").addEventListener("click", function () {
-  const inputs = document.querySelectorAll(".input-container input");
-  const values = [];
-  inputs.forEach((input) => {
-    values.push({ type: input.type, value: input.value });
+const addInput = document.getElementById("add-input");
+if (addInput) {
+  document.getElementById("add-input").addEventListener("click", function () {
+    const container = document.getElementById("input-container");
+    const inputDiv = document.createElement("div");
+    inputDiv.classList.add("input-container");
+  
+    const inputType = document.getElementById("input-type").value;
+    const input = document.createElement("input");
+    input.type = inputType;
+    input.placeholder = "Type here";
+    input.classList.add("input", "input-bordered", "w-full", "m-2");
+  
+    inputDiv.appendChild(input);
+    container.appendChild(inputDiv);
   });
-});
+}
+
+const getValuesEl = document.getElementById("get-values");
+if (getValuesEl) {
+  getValuesEl.addEventListener("click", function () {
+    const inputs = document.querySelectorAll(".input-container input");
+    const values = [];
+    inputs.forEach((input) => {
+      values.push({ type: input.type, value: input.value });
+    });
+  });
+}
