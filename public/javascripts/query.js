@@ -1,6 +1,6 @@
 async function fetchData() {
   try {
-    const response = await fetch(`${window.BASE_URL}/api/tables/local/query`);
+    const response = await fetch("/api/tables/local/query");
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -33,7 +33,7 @@ async function createForm() {
   const button = document.getElementById("runButton");
   const savebutton = document.getElementById("saveQuery");
   savebutton.onclick = async () => {
-    const name = document.getElementById("query_name").value;
+    const name = prompt("Enter a name for your query:");
     if (!name) {
       alert("Please give your query a name before saving it");
       return;
@@ -44,7 +44,7 @@ async function createForm() {
       return;
     }
     try {
-      const response = await fetch(`${window.BASE_URL}/api/tables/local/query`, {
+      const response = await fetch("/api/tables/local/query", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +76,7 @@ async function createForm() {
     tableBody.innerHTML = "";
     resultParagraph.textContent = "";
 
-    fetch(`${window.BASE_URL}/api/tables/query`, {
+    fetch("/api/tables/query", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -118,7 +118,7 @@ async function createForm() {
       .catch((error) => {
         console.error("Error:", error);
         alert(
-          "ERROR : SQL Query is incorrect \nCheck Your console for more info"
+          "ERROR : SQL Query is incorrect \nCheck Your console for more info",
         );
       });
   };

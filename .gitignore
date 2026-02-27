@@ -2,3 +2,5 @@ node_modules
 notes.md
 app.db
 src/app.ts
+dist/app.js
+dist/app.d.ts

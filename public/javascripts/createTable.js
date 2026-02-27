@@ -2,7 +2,7 @@ let pk_count = 1;
 
 async function fetchData() {
   try {
-    const response = await fetch(`${window.BASE_URL}/api/tables`);
+    const response = await fetch("/api/tables");
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -30,7 +30,7 @@ async function fetchData() {
 
 async function fetchTableInfos(tableName) {
   try {
-    const response = await fetch(`${window.BASE_URL}/api/tables/all/infos/${tableName}`); // Correct endpoint
+    const response = await fetch(`/api/tables/all/infos/${tableName}`); // Correct endpoint
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -125,7 +125,7 @@ async function createForm() {
     const defaultValueInput = document.getElementById("default-input");
     const defaultValue = defaultValueInput.value || "None";
     const tableDataTbody = document.querySelector(
-      ".main_body .table_component tbody"
+      ".main_body .table_component tbody",
     );
 
     if (!fieldName) {
@@ -199,7 +199,7 @@ async function createForm() {
 
   createButton.onclick = () => {
     const rows = document.querySelectorAll(
-      ".main_body .table_component tbody tr"
+      ".main_body .table_component tbody tr",
     );
     const tableNameInput = document.getElementById("table-name");
     const tableName = tableNameInput.value;
@@ -233,7 +233,7 @@ async function createForm() {
       };
     });
 
-    fetch(`${window.BASE_URL}/api/tables/create`, {
+    fetch("/api/tables/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -245,7 +245,7 @@ async function createForm() {
           throw new Error("Network response was not ok");
         }
         // Handle response if needed
-        window.location.href = `${window.BASE_URL}/home`;
+        window.location.href = `/home`;
       })
       .catch((error) => {
         console.error("Error creating table:", error);
@@ -254,7 +254,7 @@ async function createForm() {
 
   queryButton.onclick = async () => {
     const rows = document.querySelectorAll(
-      ".main_body .table_component tbody tr"
+      ".main_body .table_component tbody tr",
     );
     const tableNameInput = document.getElementById("table-name");
     const tableName = tableNameInput.value;
@@ -289,7 +289,7 @@ async function createForm() {
     });
 
     try {
-      await fetch(`${window.BASE_URL}/api/tables/generate/create`${window.BASE_URL}, {
+      await fetch("/api/tables/generate/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -315,7 +315,7 @@ async function createForm() {
     } catch (error) {
       console.error(error);
       alert(
-        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info"
+        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info",
       );
     }
   };

@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction, type Application } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import path from "path";
 import databaseFunctions from "./Utils/databaseFunctions";
@@ -14,11 +14,6 @@ app.set("views", path.join(__dirname, "../views"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "../public")));
 app.use(bodyParser.json());
-
-app.use((req: Request, res: Response, next) => {
-  res.locals.basePath = req.baseUrl;
-  next();
-});
 
 // Routes
 app.get("/query", (req, res) => {
@@ -53,13 +48,6 @@ export async function SqliteGuiNode(db: Database, port = 8080) {
       `SQLite Web Admin Tool running at http://localhost:${port}/home`
     );
   });
-}
-
-export async function createSqliteGuiApp(db: Database): Promise<Application> {
-  await databaseFunctions.InitializeDB(db);
-  app.use("/api/tables", tableRoutes(db));
-
-  return app;
 }
 
 // SqliteGuiNode as middleware

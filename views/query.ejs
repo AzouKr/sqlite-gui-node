@@ -1,31 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <%- include('partials/baseHead', {basePath, title: 'Custom Query' , js: ['query.js']}); %>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="/stylesheets/main.css" />
+    <link rel="stylesheet" href="/stylesheets/main.css.map" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="/javascripts/query.js"></script>
+    <title>Costum Query</title>
   </head>
   <body>
     <div class="page_body">
       <div class="sidebar">
-        <h1
-          style="text-align: center; color: white"
-          class="form-label fs-4 text"
-        >
-          SQLite GUI
-        </h1>
-        <div
-          style="
-            height: 10vh;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          "
-        >
-          <a href="<%= basePath %>/home" class="btn btn-primary">Go back to homepage</a>
+        <div class="sidebar_top">
+          <img class="sidebar_title" src="/img/logo.png" alt="Logo" />
+        </div>
+        <div class="sidebar_bottom">
+          <a style="text-decoration: none" href="/home">
+            <div class="sidebar_table_div_btn">
+              <button class="create_btn">Go back to homepage</button>
+            </div>
+          </a>
         </div>
       </div>
       <div class="right_side">
+        <nav class="right_side_navbar">
+          <a aria-current="page" class="nav_btn" href="/query">Custom query</a>
+          <a class="nav_btn" href="/import">Import database</a>
+          <a class="nav_btn" href="/output.sql">Export database</a>
+        </nav>
         <div class="main_body">
+          <div class="query_header">
+            <select
+              class="input_box_query"
+              aria-label="Default select example"
+              id="querySelect"
+            >
+              <option selected>Load saved Query</option>
+            </select>
+            <!-- <input
+              type="text"
+              class="input_box_query"
+              id="query_name"
+              placeholder="name your query"
+              aria-describedby="emailHelp"
+            /> -->
+          </div>
           <div class="mb-3">
             <label for="exampleFormControlTextarea1" class="form-label"
               >Execute your costum query here :</label
@@ -39,17 +65,10 @@
               Run
               <img
                 style="height: 2vh; margin-bottom: 0.2vh"
-                src="<%= basePath %>/icons/play.svg"
+                src="/icons/play.svg"
               />
             </button>
-            <select
-              style="position: absolute; right: 55vh; width: 23vh; top: 5.1vh"
-              class="form-select form-select-sm"
-              aria-label="Default select example"
-              id="querySelect"
-            >
-              <option selected>Load saved Query</option>
-            </select>
+
             <button
               style="position: absolute; right: 16vh"
               type="button"
@@ -58,14 +77,6 @@
             >
               Save query
             </button>
-            <input
-              style="position: absolute; right: 30vh; width: 23vh; top: 5.1vh"
-              type="text"
-              class="form-control form-control-sm"
-              id="query_name"
-              placeholder="name your query"
-              aria-describedby="emailHelp"
-            />
 
             <textarea
               style="margin-top: 2vh"

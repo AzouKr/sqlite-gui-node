@@ -34,7 +34,7 @@ function tableRoutes(db: Database) {
       const response = await databaseFunctions.insertQuery(
         db,
         name,
-        sqlStatement
+        sqlStatement,
       );
       res.status(200).json(response);
     } catch (error) {
@@ -44,10 +44,8 @@ function tableRoutes(db: Database) {
 
   router.get("/:name", async (req: Request, res: Response) => {
     const { name } = req.params;
-    const {page, perPage} = req.query;
-    
     try {
-      const response = await databaseFunctions.fetchTable(db, name, { page: Number(page), perPage: Number(perPage) });
+      const response = await databaseFunctions.fetchTable(db, name);
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -71,10 +69,12 @@ function tableRoutes(db: Database) {
                   }
                 });
               }
+              res.status(200).json(response);
             });
         });
+      } else {
+        res.status(200).json(response);
       }
-      res.status(200).json(response);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
@@ -93,10 +93,11 @@ function tableRoutes(db: Database) {
   router.post("/insert", async (req: Request, res: Response) => {
     try {
       const { tablename, dataArray } = req.body;
+      console.log("Received data for insertion:", { tablename, dataArray });
       const sql = await sqlGenerator.generateInsertSQL(
         db,
         tablename,
-        dataArray
+        dataArray,
       );
       const response = await databaseFunctions.runQuery(db, sql);
       res.status(200).json(response);
@@ -111,7 +112,7 @@ function tableRoutes(db: Database) {
       const sql = await sqlGenerator.generateInsertSQL(
         db,
         tablename,
-        dataArray
+        dataArray,
       );
       res.status(200).json(sql);
     } catch (error) {
@@ -186,7 +187,7 @@ function tableRoutes(db: Database) {
         tablename,
         dataArray,
         userId,
-        id_label
+        id_label,
       );
       const response = await databaseFunctions.runQuery(db, sql);
       res.status(200).json(response);
@@ -202,7 +203,7 @@ function tableRoutes(db: Database) {
         tablename,
         dataArray,
         userId,
-        id_label
+        id_label,
       );
       res.status(200).json(sql);
     } catch (error) {
@@ -219,13 +220,13 @@ function tableRoutes(db: Database) {
           db,
           tablename,
           label,
-          id
+          id,
         );
         res.status(200).json(response);
       } catch (error) {
         res.status(500).json({ message: "Internal server error" });
       }
-    }
+    },
   );
 
   router.post("/delete", async (req: Request, res: Response) => {
@@ -234,7 +235,7 @@ function tableRoutes(db: Database) {
       const response = await databaseFunctions.deleteFromTable(
         db,
         tablename,
-        id
+        id,
       );
       res.status(200).json(response);
     } catch (error) {

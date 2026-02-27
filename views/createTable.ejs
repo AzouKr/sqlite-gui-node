@@ -1,30 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <%- include('partials/baseHead', {basePath, title: 'Create Table' , js: ['createTable.js']}); %>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="/stylesheets/main.css" />
+    <link rel="stylesheet" href="/stylesheets/main.css.map" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="/javascripts/createTable.js"></script>
+    <title>Document</title>
   </head>
   <body>
     <div class="page_body">
       <div class="sidebar">
-        <h1
-          style="text-align: center; color: white"
-          class="form-label fs-4 text"
-        >
-          SQLite GUI
-        </h1>
-        <div
-          style="
-            height: 10vh;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          "
-        >
-          <a href="<%= basePath %>/home" class="btn btn-primary">Go back to homepage</a>
+        <div class="sidebar_top">
+          <img class="sidebar_title" src="/img/logo.png" alt="Logo" />
+        </div>
+        <div class="sidebar_bottom">
+          <a style="text-decoration: none" href="/home">
+            <div class="sidebar_table_div_btn">
+              <button class="create_btn">Go back to homepage</button>
+            </div>
+          </a>
         </div>
       </div>
       <div class="right_side">
+        <nav class="right_side_navbar">
+          <a aria-current="page" class="nav_btn" href="/query">Custom query</a>
+          <a class="nav_btn" href="/import">Import database</a>
+          <a class="nav_btn" href="/output.sql">Export database</a>
+        </nav>
         <div class="main_body">
           <div
             style="width: 40vw; position: absolute; right: 10vh; display: none"
@@ -37,20 +47,17 @@
             DATETIME column to the current timestamp whenever a new row is
             inserted. In order to insert a specific date chose type TEXT.
           </div>
-          <div class="main_body_header">
-            <h1 class="body_title">Create new table :</h1>
-          </div>
           <label class="form-label">Name of the table :</label><br />
-          <input id="table-name" class="form-control" />
+          <input id="table-name" class="input_box" />
           <br />
 
           <div class="create_box_container">
             <div class="create_box">
               <div class="create_box_top">
-                <label class="form-label">Name</label><br />
+                <label class="form-label">Name of the column :</label><br />
               </div>
               <div class="create_box_bottom">
-                <input id="input_form_name" class="form-control" />
+                <input id="input_form_name" class="input_box_multi" />
               </div>
             </div>
             <div class="create_box">
@@ -58,7 +65,7 @@
                 <label class="form-label">Type</label><br />
               </div>
               <div class="create_box_bottom">
-                <select id="input-type" class="insert_btn">
+                <select id="input-type" class="input_box_multi">
                   <option value="TEXT">TEXT</option>
                   <option value="INTEGER">INTEGER</option>
                   <option value="REAL">REAL</option>
@@ -71,9 +78,9 @@
                 <label class="form-label">Primary Key</label><br />
               </div>
               <div class="create_box_bottom">
-                <select id="input-pk" class="insert_btn">
+                <select id="input-pk" class="input_box_multi">
                   <option value="">No</option>
-                  <option value="PRIMARY KEY">Yes</option>
+                  <option value="PRIMARY KEY AUTOINCREMENT">Yes</option>
                 </select>
               </div>
             </div>
@@ -82,7 +89,7 @@
                 <label class="form-label">Foreign Key</label><br />
               </div>
               <div class="create_box_bottom">
-                <select id="input-fk" class="insert_btn">
+                <select id="input-fk" class="input_box_multi">
                   <option value="no">No</option>
                   <option value="yes">Yes</option>
                 </select>
@@ -90,10 +97,10 @@
             </div>
             <div style="display: none" class="create_box" id="table-input-div">
               <div class="create_box_top">
-                <label class="form-label">Table</label><br />
+                <label class="form-label">Table to be referenced</label><br />
               </div>
               <div class="create_box_bottom">
-                <select id="input-table" class="insert_btn"></select>
+                <select id="input-table" class="input_box_multi"></select>
               </div>
             </div>
             <div style="display: none" class="create_box" id="Columns">
@@ -106,10 +113,10 @@
             </div>
             <div class="create_box" id="default-input-div">
               <div class="create_box_top">
-                <label class="form-label">Default Value</label><br />
+                <label class="input_label">Default Value</label><br />
               </div>
               <div class="create_box_bottom">
-                <input id="default-input" class="form-control" />
+                <input id="default-input" class="input_box_multi" />
               </div>
             </div>
           </div>

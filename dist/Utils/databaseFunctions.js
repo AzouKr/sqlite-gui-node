@@ -118,50 +118,19 @@ function fetchAllTables(db) {
         });
     });
 }
-function fetchTable(db_1, table_1) {
-    return __awaiter(this, arguments, void 0, function* (db, table, pagination = { page: 1, perPage: 50 }) {
-        const page = pagination.page;
-        const limit = pagination.perPage;
-        const offset = (page - 1) * limit;
-        const [rows, total] = yield Promise.all([
-            new Promise((resolve, reject) => {
-                db.all(`SELECT * FROM ${(0, helpers_1.quoteColumn)(table)} LIMIT ${limit} OFFSET ${offset}`, function (error, rows) {
-                    if (error) {
-                        logger_1.default.error("Error while fetching table");
-                        logger_1.default.error(error.message);
-                        reject({ bool: false, error: error.message });
-                        return;
-                    }
-                    else {
-                        resolve(rows);
-                    }
-                });
-            }),
-            new Promise((resolve, reject) => {
-                db.get(`SELECT COUNT(*) FROM ${(0, helpers_1.quoteColumn)(table)};`, function (error, res) {
-                    var _a;
-                    if (error) {
-                        logger_1.default.error("Error while fetching table");
-                        logger_1.default.error(error.message);
-                        reject({ bool: false, error: error.message });
-                        return;
-                    }
-                    else {
-                        resolve((_a = Object.values(res)[0]) !== null && _a !== void 0 ? _a : 0);
-                    }
-                });
-            }),
-        ]);
-        return {
-            bool: true,
-            data: rows || [],
-            meta: {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(Number(total) / limit)
+function fetchTable(db, table) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM ${(0, helpers_1.quoteColumn)(table)}`, function (error, rows) {
+            if (error) {
+                logger_1.default.error("Error while fetching table");
+                logger_1.default.error(error.message);
+                reject({ bool: false, error: error.message });
+                return;
             }
-        };
+            else {
+                resolve({ bool: true, data: rows });
+            }
+        });
     });
 }
 function fetchRecord(db, table, label, id) {

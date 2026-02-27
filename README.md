@@ -1,5 +1,7 @@
 # SQLite GUI for Node.js Apps
 
+![Logo](public/img/logo_small.png)
+
 [![Version npm](https://img.shields.io/npm/v/sqlite-gui-node.svg?style=flat-square)](https://www.npmjs.com/package/sqlite-gui-node)
 [![npm Downloads](https://img.shields.io/npm/dm/sqlite-gui-node.svg?style=flat-square)](https://www.npmjs.com/package/sqlite-gui-node)
 
@@ -88,18 +90,18 @@ app.listen(4000);
 You can also integrate SQLite GUI by using the createSqliteGuiApp function. This function returns a separate Express application (router) that you can mount as middleware on a desired path in your main application.
 
 ```js
-const sqlite3 = require('sqlite3').verbose();
-const { createSqliteGuiApp } = require('sqlite-gui-node');
-const express = require('express');
+const sqlite3 = require("sqlite3").verbose();
+const { createSqliteGuiApp } = require("sqlite-gui-node");
+const express = require("express");
 
 const app = express();
-const db = new sqlite3.Database('app.db');
+const db = new sqlite3.Database("app.db");
 
 // Create the SQLite GUI app
 const sqliteGuiApp = await createSqliteGuiApp(db);
 
-// Mount the SQLite GUI app on the 
-app.use('/sqlite', sqliteGuiApp);
+// Mount the SQLite GUI app on the
+app.use("/sqlite", sqliteGuiApp);
 ```
 
 Now all SQLite GUI routes will be accessible under the /sqlite path. For example, the main dashboard will be available at `/sqlite/home`.

@@ -3,14 +3,12 @@ let userId;
 let id_label;
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const pathParts = window.location.pathname
-    .replace(window.BASE_URL, '')
-    .split("/");
+  const pathParts = window.location.pathname.split("/");
   tablename = pathParts[2];
   id_label = pathParts[3];
   userId = pathParts[4];
   const response = await fetch(
-    `${window.BASE_URL}/api/tables/getrecord/${tablename}/${id_label}/${userId}`
+    `/api/tables/getrecord/${tablename}/${id_label}/${userId}`,
   ); // Correct endpoint
   if (!response.ok) {
     throw new Error("Network response was not ok");
@@ -25,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function fetchTableInfos(tableName, dataObject) {
   try {
-    const response = await fetch(`${window.BASE_URL}/api/tables/infos/${tableName}`); // Correct endpoint
+    const response = await fetch(`/api/tables/infos/${tableName}`); // Correct endpoint
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -55,30 +53,23 @@ function displayTableData(fields, dataObject) {
   const mainBodyDiv = document.querySelector(".main_body");
   mainBodyDiv.innerHTML = ""; // Clear previous data
 
-  const headerDiv = document.createElement("div");
-  headerDiv.classList.add("main_body_header");
-
-  const bodyTitle = document.createElement("h1");
-  bodyTitle.classList.add("form-label");
-  bodyTitle.textContent = "Edit the row :";
-  headerDiv.appendChild(bodyTitle);
-
-  mainBodyDiv.appendChild(headerDiv);
+  const boxContainer = document.createElement("div");
+  boxContainer.classList.add("create_box_container_two");
+  mainBodyDiv.appendChild(boxContainer);
 
   fields.forEach((field) => {
+    const createBox = document.createElement("div");
+    createBox.classList.add("create_box_two");
     const label = document.createElement("label");
     label.classList.add("form-label");
     label.textContent = field.field;
     label.setAttribute("for", `input-${field.field}`);
-    mainBodyDiv.appendChild(label);
-
-    const br = document.createElement("br");
-    mainBodyDiv.appendChild(br);
+    createBox.appendChild(label);
 
     if (field.fk === undefined) {
       const input = document.createElement("input");
       input.classList.add("form-control");
-      input.classList.add("input_value");
+      input.classList.add("input_box_multi");
       input.setAttribute("id", field.field);
       input.dataset.fieldType = field.type; // Store field type in dataset
       input.dataset.field = field.field;
@@ -88,12 +79,12 @@ function displayTableData(fields, dataObject) {
       if (dataObject && dataObject.hasOwnProperty(field.field)) {
         input.value = dataObject[field.field];
       }
-      mainBodyDiv.appendChild(input);
+      createBox.appendChild(input);
     } else {
       // Create the select element
       const select = document.createElement("select");
       select.className = "form-select";
-      select.classList.add("input_value");
+      select.classList.add("input_box_multi");
       select.dataset.fieldType = field.type; // Store field type in dataset
       select.dataset.field = field.field;
       select.setAttribute("id", field.field);
@@ -114,11 +105,12 @@ function displayTableData(fields, dataObject) {
       if (dataObject && dataObject.hasOwnProperty(field.field)) {
         select.value = dataObject[field.field];
       }
-      mainBodyDiv.appendChild(select);
+      createBox.appendChild(select);
     }
 
     const br2 = document.createElement("br");
-    mainBodyDiv.appendChild(br2);
+    createBox.appendChild(br2);
+    boxContainer.appendChild(createBox);
   });
 
   // Create button for editing
@@ -126,7 +118,7 @@ function displayTableData(fields, dataObject) {
   editButton.textContent = "Edit row";
   editButton.classList.add("insert_btn"); // Apply the class for styling
   editButton.addEventListener("click", () => {
-    const inputs = document.querySelectorAll(".input_value");
+    const inputs = document.querySelectorAll(".input_box_multi");
     const dataArray = Array.from(inputs).map((input) => {
       let value = input.value;
       const type = input.dataset.fieldType;
@@ -150,7 +142,7 @@ function displayTableData(fields, dataObject) {
     });
 
     // Send POST request to API
-    fetch(`${window.BASE_URL}/api/tables/update`, {
+    fetch("/api/tables/update", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -161,7 +153,7 @@ function displayTableData(fields, dataObject) {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        window.location.href = `${window.BASE_URL}/home`;
+        window.location.href = `/home`;
       })
       .catch((error) => {
         console.error("Error updating data:", error);
@@ -174,7 +166,7 @@ function displayTableData(fields, dataObject) {
   getQueryButton.textContent = "Get query";
   getQueryButton.classList.add("insert_btn");
   getQueryButton.addEventListener("click", async () => {
-    const inputs = document.querySelectorAll(".input_value");
+    const inputs = document.querySelectorAll(".input_box_multi");
     let id_name;
     let count = 0;
     const dataArray = Array.from(inputs).map((input) => {
@@ -192,7 +184,7 @@ function displayTableData(fields, dataObject) {
     });
 
     try {
-      const response = await fetch(`${window.BASE_URL}/api/tables/generate/update`, {
+      const response = await fetch("/api/tables/generate/update", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -218,7 +210,7 @@ function displayTableData(fields, dataObject) {
     } catch (error) {
       console.error(error);
       alert(
-        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info"
+        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info",
       );
     }
   });

@@ -32,13 +32,9 @@ declare function fetchAllTables(db: Database): Promise<{
     bool: boolean;
     data?: string[];
 }>;
-declare function fetchTable(db: Database, table: string, pagination?: {
-    page: number;
-    perPage: number;
-}): Promise<{
+declare function fetchTable(db: Database, table: string): Promise<{
     bool: boolean;
     data?: any[];
-    meta: any;
 }>;
 declare function fetchRecord(db: Database, table: string, label: string, id: number | string): Promise<{
     bool: boolean;

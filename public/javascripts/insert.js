@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function fetchTableInfos(tableName) {
   try {
-    const response = await fetch(`${window.BASE_URL}/api/tables/infos/${tableName}`); // Correct endpoint
+    const response = await fetch(`/api/tables/infos/${tableName}`); // Correct endpoint
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -42,40 +42,34 @@ function displayTableData(fields) {
   const mainBodyDiv = document.querySelector(".main_body");
   mainBodyDiv.innerHTML = ""; // Clear previous data
 
-  const headerDiv = document.createElement("div");
-  headerDiv.classList.add("main_body_header");
-
-  const bodyTitle = document.createElement("h1");
-  bodyTitle.classList.add("form-label");
-  bodyTitle.textContent = "Insert new row :";
-  headerDiv.appendChild(bodyTitle);
-
-  mainBodyDiv.appendChild(headerDiv);
+  const boxContainer = document.createElement("div");
+  boxContainer.classList.add("create_box_container_two");
+  mainBodyDiv.appendChild(boxContainer);
 
   fields.forEach((field) => {
+    const createBox = document.createElement("div");
+    createBox.classList.add("create_box_two");
+
     const label = document.createElement("label");
     label.classList.add("form-label");
     label.textContent = field.field;
     label.setAttribute("for", field.field);
-    mainBodyDiv.appendChild(label);
-
-    const br = document.createElement("br");
-    mainBodyDiv.appendChild(br);
+    createBox.appendChild(label);
 
     if (field.fk === undefined) {
       const input = document.createElement("input");
       input.classList.add("form-control");
-      input.classList.add("input_value");
+      input.classList.add("input_box_multi");
       input.setAttribute("id", field.field);
       input.dataset.fieldType = field.type; // Store field type in dataset
       input.type = getInputType(field.type);
       input.placeholder = field.field;
-      mainBodyDiv.appendChild(input);
+      createBox.appendChild(input);
     } else {
       // Create the select element
       const select = document.createElement("select");
       select.className = "form-select";
-      select.classList.add("input_value");
+      select.classList.add("input_box_multi");
       select.dataset.fieldType = field.type; // Store field type in dataset
       select.setAttribute("id", field.field);
       select.placeholder = field.field;
@@ -92,17 +86,18 @@ function displayTableData(fields) {
         option.textContent = num; // or use any other text you need, like converting numbers to words
         select.appendChild(option);
       });
-      mainBodyDiv.appendChild(select);
+      createBox.appendChild(select);
     }
     const br2 = document.createElement("br");
-    mainBodyDiv.appendChild(br2);
+    createBox.appendChild(br2);
+    boxContainer.appendChild(createBox);
   });
 
   const insertButton = document.createElement("button");
   insertButton.textContent = "Insert";
   insertButton.classList.add("insert_btn");
   insertButton.addEventListener("click", async () => {
-    const inputs = document.querySelectorAll(".input_value");
+    const inputs = document.querySelectorAll(".input_box_multi");
     const dataArray = Array.from(inputs).map((input) => {
       const value = input.value;
       const type = input.dataset.fieldType; // Retrieve field type from dataset
@@ -114,7 +109,7 @@ function displayTableData(fields) {
     });
 
     try {
-      const response = await fetch(`${window.BASE_URL}/api/tables/insert`, {
+      const response = await fetch("/api/tables/insert", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -131,7 +126,7 @@ function displayTableData(fields) {
     } catch (error) {
       console.error(error);
       alert(
-        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info"
+        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info",
       );
     }
   });
@@ -142,7 +137,7 @@ function displayTableData(fields) {
   getQueryButton.textContent = "Get query";
   getQueryButton.classList.add("insert_btn");
   getQueryButton.addEventListener("click", async () => {
-    const inputs = document.querySelectorAll(".input_value");
+    const inputs = document.querySelectorAll(".input_box_multi");
     const dataArray = Array.from(inputs).map((input) => {
       const value = input.value;
       const type = input.dataset.fieldType; // Retrieve field type from dataset
@@ -154,7 +149,7 @@ function displayTableData(fields) {
     });
 
     try {
-      const response = await fetch(`${window.BASE_URL}/api/tables/generate/insert`, {
+      const response = await fetch("/api/tables/generate/insert", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -180,7 +175,7 @@ function displayTableData(fields) {
     } catch (error) {
       console.error(error);
       alert(
-        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info"
+        "ERROR : Check the columns with no default value if they are filled \nCheck Your console for more info",
       );
     }
   });
